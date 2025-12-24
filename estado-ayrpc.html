@@ -13,6 +13,7 @@
   --ok:#3cff8f;
   --warn:#ffd84c;
   --bad:#ff4c4c;
+  --neutral:#7a82c8;
 }
 *{box-sizing:border-box}
 body{
@@ -87,9 +88,11 @@ button.secondary{
   padding:10px;
   border-bottom:1px solid rgba(255,255,255,.15);
 }
+
 .estado-ok{color:var(--ok);font-weight:bold}
 .estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
+.estado-neutral{color:var(--neutral);font-weight:bold}
 
 .graficos{
   display:grid;
@@ -164,7 +167,7 @@ const API_URL = "https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8
 document.getElementById("btnVer").addEventListener("click", cargar);
 
 function parseTiempo(t){
-  if(!t || t==="0" || t==="AUSENTE") return 0;
+  if(!t || t==="0" || t==="0h 0m 0s") return 0;
   const h=/(\d+)h/.exec(t);
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
@@ -195,10 +198,10 @@ function cargar(){
         {k:"2da", n:"Segunda Clase", min:5100},
         {k:"3er", n:"Tercer Clase",  min:5700},
 
-        {k:"4ta", n:"Cuarta Clase",  prox:true},
-        {k:"5ta", n:"Quinta Clase",  prox:true},
-        {k:"6ta", n:"Sexta Clase",   prox:true},
-        {k:"Ultima", n:"Última Clase", prox:true}
+        {k:"4ta", n:"Cuarta Clase",  futura:true},
+        {k:"5ta", n:"Quinta Clase",  futura:true},
+        {k:"6ta", n:"Sexta Clase",   futura:true},
+        {k:"Ultima", n:"Última Clase", futura:true}
       ];
 
       let presentes = 0;
@@ -207,13 +210,14 @@ function cargar(){
 
       clases.forEach((c,i)=>{
 
-        if(c.prox){
-          const estadoCelda = a[c.k + "Clase – Presente"] || "PROXIMAMENTE";
+        /* ===== CLASES FUTURAS ===== */
+        if(c.futura){
+          const fecha = String(a[c.k+"Clase – Presente"] || "").trim() || "PROXIMAMENTE";
 
           tablaClases.innerHTML += `
             <tr>
               <td>${c.n}</td>
-              <td class="estado-warn">${estadoCelda}</td>
+              <td class="estado-neutral">${fecha}</td>
               <td>PROXIMAMENTE</td>
               <td>-</td>
             </tr>
@@ -223,10 +227,12 @@ function cargar(){
           graficos.innerHTML += `<div id="${divId}"></div>`;
 
           Plotly.newPlot(divId,[{
-            values:[1],
-            labels:["PROXIMAMENTE"],
+            values:[1,1],
+            labels:["PROXIMAMENTE",""],
+            marker:{colors:["#7a82c8","#1b1f3b"]},
             type:"pie",
-            hole:.65
+            hole:.7,
+            textinfo:"label"
           }],{
             title:c.n,
             paper_bgcolor:"transparent",
@@ -237,14 +243,17 @@ function cargar(){
           return;
         }
 
+        /* ===== CLASES REALES ===== */
+        const estadoSheet = String(a[c.k+"Clase – Presente"] || "").toUpperCase();
         const tiempo = a[c.k+"Clase – Tiempo"];
         const seg = parseTiempo(tiempo);
 
         let estado="AUSENTE", cls="estado-bad";
-        if(seg>0){
-          if(seg>=c.min){estado="PRESENTE";cls="estado-ok";presentes++;}
-          else{estado="REVISAR";cls="estado-warn";}
-        }
+        if(estadoSheet==="PRESENTE"){estado="PRESENTE";cls="estado-ok";}
+        else if(estadoSheet==="REVISAR"){estado="REVISAR";cls="estado-warn";}
+        else if(estadoSheet==="RECUPERADA"){estado="RECUPERADA";cls="estado-ok";}
+
+        if(estado==="PRESENTE" || estado==="RECUPERADA") presentes++;
 
         const pct = Math.min(100,Math.round(seg/c.min*100));
 
@@ -273,13 +282,9 @@ function cargar(){
         });
       });
 
-      kAsistencia.innerText = presentes+"/"+3;
-      kPorcentaje.innerText = Math.round(presentes/3*100)+"%";
-      kEstado.innerText = presentes/3>=0.75 ? "REGULAR" : "EN RIESGO";
-    })
-    .catch(e=>{
-      alert("Error de conexión");
-      console.error(e);
+      kAsistencia.innerText = presentes + "/3";
+      kPorcentaje.innerText = Math.round(presentes/3*100) + "%";
+      kEstado.innerText = presentes/3 >= 0.75 ? "REGULAR" : "EN RIESGO";
     });
 }
 
@@ -309,5 +314,3 @@ if(dniURL){
 
 </body>
 </html>
-
-
