@@ -52,19 +52,38 @@ button{
 }
 
 /* BOTON VOLVER */
+/* BOTÓN VOLVER – chico, fijo y prolijo a la izquierda */
 #btnVolver{
   position:fixed;
-  top:12px;
-  left:12px;
-  padding:4px 10px;
-  font-size:12px;
-  display:none;
+  top:10px;
+  left:10px;
+
+  width:auto;
+  min-width:unset;
+  padding:4px 8px;
+
+  font-size:11px;
+  line-height:1;
+  font-weight:600;
+
+  display:none;           /* se muestra por JS */
+  align-items:center;
+  gap:6px;
+
   background:rgba(20,25,60,.92);
   color:#fff;
   border:1px solid var(--neon);
-  border-radius:8px;
+  border-radius:6px;
+
+  cursor:pointer;
   z-index:9999;
+  box-shadow:0 0 6px rgba(108,99,255,.35);
 }
+
+#btnVolver:hover{
+  background:var(--neon);
+}
+
 
 /* KPI */
 .kpis{
@@ -351,3 +370,4 @@ function volver(){
 
 </body>
 </html>
+
