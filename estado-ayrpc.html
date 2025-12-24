@@ -502,8 +502,9 @@ function cargar(){
     kEstado.className = "estado-warn";
   }
 
+}); // ← cierra el .then(a=>{ ... })
 
-}
+}   // ← cierra function cargar()
 
 function volver(){
   contenido.style.display="none";
@@ -592,6 +593,7 @@ cronogramaHeader.addEventListener('click', cerrarCronograma);
 
 </body>
 </html>
+
 
 
 
