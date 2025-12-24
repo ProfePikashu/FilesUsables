@@ -23,7 +23,7 @@ body{
 }
 .container{
   padding:16px;
-  max-width:1100px;
+  max-width:1200px;
   margin:auto;
 }
 .card{
@@ -49,6 +49,9 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
+button.secondary{
+  background:#2b2f6a;
+}
 
 .kpis{
   display:grid;
@@ -72,7 +75,7 @@ button{
   grid-template-columns:1fr 1fr;
   gap:8px;
 }
-@media(max-width:700px){
+@media(max-width:800px){
   .datos{grid-template-columns:1fr}
 }
 
@@ -90,7 +93,7 @@ button{
 
 .graficos{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:16px;
 }
 </style>
@@ -145,24 +148,23 @@ button{
 
 <div class="card">
   <h3>Gráficos por clase</h3>
-  <div class="graficos">
-    <div id="g1"></div>
-    <div id="g2"></div>
-    <div id="g3"></div>
-  </div>
+  <div class="graficos" id="graficos"></div>
+</div>
+
+<div class="card">
+  <button class="secondary" onclick="volver()">🔁 Ver otro DNI</button>
 </div>
 
 </div>
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
+const API_URL = "https://script.google.com/macros/s/TU_ID/exec";
 
-const btn = document.getElementById("btnVer");
-btn.addEventListener("click", cargar);
+document.getElementById("btnVer").addEventListener("click", cargar);
 
 function parseTiempo(t){
-  if(!t || t==="AUSENTE") return 0;
+  if(!t || t==="0" || t==="AUSENTE") return 0;
   const h=/(\d+)h/.exec(t);
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
@@ -174,55 +176,95 @@ function cargar(){
   if(!dni) return alert("Ingresá tu DNI");
 
   fetch(API_URL + "?dni=" + dni)
-    .then(r => r.json())
-    .then(a => {
-      if(a.error){ alert(a.error); return; }
+    .then(r=>r.json())
+    .then(a=>{
+      if(a.error){alert(a.error);return;}
 
-      document.getElementById("login").style.display="none";
-      document.getElementById("contenido").style.display="block";
+      login.style.display="none";
+      contenido.style.display="block";
 
-      document.getElementById("nombre").innerText = a["Nombre Completo"];
-      document.getElementById("d-correo").innerText = a["Correo"] || "-";
-      document.getElementById("d-telefono").innerText = a["Teléfono (con Código de Área)"] || "-";
-      document.getElementById("d-twitch").innerText =
+      nombre.innerText = a["Nombre Completo"];
+      dCorreo.innerText = a["Correo"] || "-";
+      dTelefono.innerText = a["Teléfono (con Código de Área)"] || "-";
+      dTwitch.innerText =
         a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"] || "-";
-      document.getElementById("d-obs").innerText = a["Observaciones"] || "-";
+      dObs.innerText = a["Observaciones"] || "-";
 
       const clases = [
-        {n:"Primer Clase", t:a["1erClase – Tiempo"], min:(3*3600+10*60)*0.75, div:"g1"},
-        {n:"Segunda Clase", t:a["2daClase – Tiempo"], min:5100, div:"g2"},
-        {n:"Tercer Clase", t:a["3erClase – Tiempo"], min:5700, div:"g3"}
+        {k:"1er", n:"Primer Clase",  min:(3*3600+10*60)*0.75},
+        {k:"2da", n:"Segunda Clase", min:5100},
+        {k:"3er", n:"Tercer Clase",  min:5700},
+
+        {k:"4ta", n:"Cuarta Clase",  prox:true},
+        {k:"5ta", n:"Quinta Clase",  prox:true},
+        {k:"6ta", n:"Sexta Clase",   prox:true},
+        {k:"Ultima", n:"Última Clase", prox:true}
       ];
 
-      let pres = 0;
-      const tbody = document.getElementById("tablaClases");
-      tbody.innerHTML = "";
+      let presentes = 0;
+      tablaClases.innerHTML="";
+      graficos.innerHTML="";
 
-      clases.forEach(c=>{
-        const seg = parseTiempo(c.t);
+      clases.forEach((c,i)=>{
+
+        if(c.prox){
+          const estadoCelda = a[c.k + "Clase – Presente"] || "PROXIMAMENTE";
+
+          tablaClases.innerHTML += `
+            <tr>
+              <td>${c.n}</td>
+              <td class="estado-warn">${estadoCelda}</td>
+              <td>PROXIMAMENTE</td>
+              <td>-</td>
+            </tr>
+          `;
+
+          const divId="g"+i;
+          graficos.innerHTML += `<div id="${divId}"></div>`;
+
+          Plotly.newPlot(divId,[{
+            values:[1],
+            labels:["PROXIMAMENTE"],
+            type:"pie",
+            hole:.65
+          }],{
+            title:c.n,
+            paper_bgcolor:"transparent",
+            font:{color:"#fff"},
+            showlegend:false
+          });
+
+          return;
+        }
+
+        const tiempo = a[c.k+"Clase – Tiempo"];
+        const seg = parseTiempo(tiempo);
+
         let estado="AUSENTE", cls="estado-bad";
-
         if(seg>0){
-          if(seg>=c.min){estado="PRESENTE";cls="estado-ok";pres++;}
+          if(seg>=c.min){estado="PRESENTE";cls="estado-ok";presentes++;}
           else{estado="REVISAR";cls="estado-warn";}
         }
 
-        const pct = Math.min(100, Math.round(seg/c.min*100));
+        const pct = Math.min(100,Math.round(seg/c.min*100));
 
-        tbody.innerHTML += `
+        tablaClases.innerHTML += `
           <tr>
             <td>${c.n}</td>
             <td class="${cls}">${estado}</td>
-            <td>${c.t || "-"}</td>
+            <td>${tiempo || "0h 0m 0s"}</td>
             <td>${pct}%</td>
           </tr>
         `;
 
-        Plotly.newPlot(c.div,[{
+        const divId="g"+i;
+        graficos.innerHTML += `<div id="${divId}"></div>`;
+
+        Plotly.newPlot(divId,[{
           values:[pct,100-pct],
           labels:["Conectado","Faltante"],
           type:"pie",
-          hole:.6
+          hole:.65
         }],{
           title:c.n,
           paper_bgcolor:"transparent",
@@ -231,27 +273,39 @@ function cargar(){
         });
       });
 
-      document.getElementById("k-asistencia").innerText = pres + "/" + clases.length;
-      document.getElementById("k-porcentaje").innerText = Math.round(pres/clases.length*100) + "%";
-      document.getElementById("k-estado").innerText = pres/clases.length>=0.75 ? "REGULAR" : "EN RIESGO";
+      kAsistencia.innerText = presentes+"/"+3;
+      kPorcentaje.innerText = Math.round(presentes/3*100)+"%";
+      kEstado.innerText = presentes/3>=0.75 ? "REGULAR" : "EN RIESGO";
     })
-    .catch(err=>{
+    .catch(e=>{
       alert("Error de conexión");
-      console.error(err);
+      console.error(e);
     });
 }
 
-// Auto DNI por URL
-const dniURL = new URLSearchParams(location.search).get("dni");
+function volver(){
+  contenido.style.display="none";
+  login.style.display="block";
+  dniInput.value="";
+  history.replaceState(null,"",location.pathname);
+}
+
+// refs
+const dCorreo=document.getElementById("d-correo");
+const dTelefono=document.getElementById("d-telefono");
+const dTwitch=document.getElementById("d-twitch");
+const dObs=document.getElementById("d-obs");
+const kAsistencia=document.getElementById("k-asistencia");
+const kPorcentaje=document.getElementById("k-porcentaje");
+const kEstado=document.getElementById("k-estado");
+
+// auto DNI
+const dniURL=new URLSearchParams(location.search).get("dni");
 if(dniURL){
-  document.getElementById("dniInput").value = dniURL;
+  dniInput.value=dniURL;
   cargar();
 }
 </script>
 
 </body>
 </html>
-
-
-
-
