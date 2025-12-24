@@ -454,26 +454,36 @@ function cargar(){
     let totalValidas = 0;
 
 ORDEN.forEach((item, index) => {
-  const estadoRaw = (a[item.k + "Clase – Presente"] || "").toUpperCase();
+
+  const estadoRaw = (a[item.k + "Clase – Presente"] || "-").toUpperCase();
   const tiempo = a[item.k + "Clase – Tiempo"] || "-";
 
   let claseCss = "estado-neutral";
 
-  if (estadoRaw === "PRESENTE") claseCss = "estado-ok";
-  else if (estadoRaw === "RECUPERADA") claseCss = "estado-ok";
+  if (estadoRaw === "PRESENTE" || estadoRaw === "RECUPERADA") claseCss = "estado-ok";
   else if (estadoRaw === "AUSENTE") claseCss = "estado-bad";
   else if (estadoRaw === "REVISAR") claseCss = "estado-warn";
 
   tablaClases.innerHTML += `
     <tr>
       <td>${item.n}</td>
-      <td class="${claseCss}">${estadoRaw || "-"}</td>
+      <td class="${claseCss}">${estadoRaw}</td>
       <td>${tiempo}</td>
       <td>-</td>
     </tr>
   `;
+  const g = document.createElement("div");
+graficos.appendChild(g);
 
-  // 👉 solo contamos las primeras 3
+if (CFG[item.k] && tiempo !== "-" && tiempo !== "") {
+  const tSeg = parseTiempo(tiempo);
+  barra(g, CFG[item.k], tSeg, item.n);
+} else {
+  barraFutura(g, item.n);
+}
+
+
+  // KPI: solo cuentan las primeras 3
   if (index < 3 && (estadoRaw === "PRESENTE" || estadoRaw === "RECUPERADA")) {
     totalValidas++;
   }
@@ -586,6 +596,7 @@ cronogramaHeader.addEventListener('click', cerrarCronograma);
 
 </body>
 </html>
+
 
 
 
