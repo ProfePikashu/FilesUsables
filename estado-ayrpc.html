@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AyRPC – Estado del Alumno</title>
+<title>AyRPC – Estado Académico</title>
 
 <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
@@ -23,23 +23,18 @@ body{
 }
 .container{
   padding:16px;
-  max-width:900px;
+  max-width:1100px;
   margin:auto;
 }
 .card{
-  background:rgba(20,25,60,.85);
+  background:rgba(20,25,60,.9);
   border:1px solid var(--neon);
   border-radius:14px;
   padding:16px;
   margin-bottom:16px;
-  box-shadow:0 0 20px rgba(108,99,255,.25);
-  animation:fadeIn .6s ease;
+  box-shadow:0 0 18px rgba(108,99,255,.25);
 }
-@keyframes fadeIn{
-  from{opacity:0;transform:translateY(10px)}
-  to{opacity:1;transform:none}
-}
-h1,h2{margin:0 0 10px}
+h1,h2,h3{margin:0 0 10px}
 input,button{
   width:100%;
   padding:12px;
@@ -53,11 +48,11 @@ button{
   color:#fff;
   font-weight:bold;
 }
-.kpis, .clases{
+.kpis{
   display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
   gap:12px;
 }
-.kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
 .kpi{
   background:#0d1230;
   border-radius:12px;
@@ -65,26 +60,40 @@ button{
   text-align:center;
 }
 .kpi span{display:block;font-size:22px;font-weight:bold}
-.clase{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  background:#0d1230;
-  border-radius:12px;
-  padding:12px;
+
+.datos{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
 }
-.estado.OK{color:var(--ok)}
-.estado.WARN{color:var(--warn)}
-.estado.BAD{color:var(--bad)}
+@media(max-width:700px){
+  .datos{grid-template-columns:1fr}
+}
+
+.tabla{
+  width:100%;
+  border-collapse:collapse;
+}
+.tabla th,.tabla td{
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+.estado-ok{color:var(--ok);font-weight:bold}
+.estado-warn{color:var(--warn);font-weight:bold}
+.estado-bad{color:var(--bad);font-weight:bold}
+
+.graficos{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
 </style>
 
 <script>
-// 🔒 Bloqueos básicos
 document.addEventListener("contextmenu",e=>e.preventDefault());
 document.addEventListener("keydown",e=>{
-  if(
-    e.ctrlKey && ["u","s","c","i","j"].includes(e.key.toLowerCase())
-  ) e.preventDefault();
+  if(e.ctrlKey && ["u","s","c","i","j"].includes(e.key.toLowerCase()))
+    e.preventDefault();
 });
 </script>
 </head>
@@ -96,31 +105,70 @@ document.addEventListener("keydown",e=>{
 
 <div class="card" id="login">
   <h2>Ingresá tu DNI</h2>
-  <input id="dniInput" type="number" placeholder="DNI">
+  <input id="dniInput" type="number" placeholder="DNI sin puntos">
   <button onclick="cargar()">Ver mi estado</button>
 </div>
 
-<div class="card" id="panel" style="display:none">
+<div id="contenido" style="display:none">
+
+<div class="card">
   <h2 id="nombre"></h2>
-  <div class="kpis" id="kpis"></div>
+  <div class="kpis">
+    <div class="kpi">Asistencia<span id="k-asistencia"></span></div>
+    <div class="kpi">%<span id="k-porcentaje"></span></div>
+    <div class="kpi">Mail<span id="k-mail"></span></div>
+    <div class="kpi">Estado<span id="k-estado"></span></div>
+  </div>
 </div>
 
-<div class="card" id="panelClases" style="display:none">
-  <h2>Situación por clase</h2>
-  <div class="clases" id="clases"></div>
+<div class="card">
+  <h3>Datos de inscripción</h3>
+  <div class="datos">
+    <div><b>Correo:</b> <span id="d-correo"></span></div>
+    <div><b>Teléfono:</b> <span id="d-telefono"></span></div>
+    <div><b>Usuario Twitch:</b> <span id="d-twitch"></span></div>
+    <div><b>Observaciones:</b> <span id="d-obs"></span></div>
+    <div><b>Mail enviado:</b> <span id="d-mail"></span></div>
+  </div>
 </div>
 
-<div class="card" id="panelGrafico" style="display:none">
-  <div id="grafico"></div>
+<div class="card">
+  <h3>Situación por clase</h3>
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Clase</th>
+        <th>Situación</th>
+        <th>Tiempo</th>
+        <th>% Conectado</th>
+      </tr>
+    </thead>
+    <tbody id="tablaClases"></tbody>
+  </table>
 </div>
 
+<div class="card">
+  <h3>Gráficos por clase</h3>
+  <div class="graficos">
+    <div id="g1"></div>
+    <div id="g2"></div>
+    <div id="g3"></div>
+  </div>
+</div>
+
+</div>
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbXPHF_PgIolloJet5sR9EP8BF60XkmPpC/exec";
 
-const dniURL=new URLSearchParams(location.search).get("dni");
-if(dniURL){document.getElementById("dniInput").value=dniURL; cargar();}
+function parseTiempo(t){
+  if(!t||t==="AUSENTE") return 0;
+  const h=/(\d+)h/.exec(t);
+  const m=/(\d+)m/.exec(t);
+  const s=/(\d+)s/.exec(t);
+  return (h?+h[1]:0)*3600+(m?+m[1]:0)*60+(s?+s[1]:0);
+}
 
 function cargar(){
   const dni=document.getElementById("dniInput").value;
@@ -129,50 +177,77 @@ function cargar(){
   .then(a=>{
     if(a.error){alert(a.error);return;}
 
-    document.getElementById("login").style.display="none";
-    panel.style.display="block";
-    panelClases.style.display="block";
-    panelGrafico.style.display="block";
+    login.style.display="none";
+    contenido.style.display="block";
 
     nombre.innerText=a["Nombre Completo"];
+    dCorreo.innerText=a["Correo"];
+    dTelefono.innerText=a["Teléfono (con Código de Área)"];
+    dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
+    dObs.innerText=a["Observaciones"]||"-";
+    dMail.innerText=a["Mail enviado"];
 
     const clases=[
-      ["1er Clase",a["1erClase – Presente"]],
-      ["2da Clase",a["2daClase – Presente"]],
-      ["3er Clase",a["3erClase – Presente"]],
+      {n:"Primer Clase",p:a["1erClase – Presente"],t:a["1erClase – Tiempo"],min:(3*3600+10*60)*0.75,div:"g1"},
+      {n:"Segunda Clase",p:a["2daClase – Presente"],t:a["2daClase – Tiempo"],min:5100,div:"g2"},
+      {n:"Tercer Clase",p:a["3erClase – Presente"],t:a["3erClase – Tiempo"],min:5700,div:"g3"}
     ];
 
-    let pres=0,aus=0;
-    clases.forEach(c=>c[1]==="PRESENTE"?pres++:aus++);
+    let pres=0;
+    tablaClases.innerHTML="";
 
-    kpis.innerHTML=`
-      <div class="kpi">Asistencia<span>${pres}/3</span></div>
-      <div class="kpi">%<span>${Math.round(pres/3*100)}%</span></div>
-      <div class="kpi">Mail<span>${a["Mail enviado"]}</span></div>
-      <div class="kpi">Estado<span>${pres/3>=0.75?"REGULAR":"RIESGO"}</span></div>
-    `;
-
-    clasesDiv.innerHTML="";
     clases.forEach(c=>{
-      const estado=c[1]==="PRESENTE"?"OK":"BAD";
-      clasesDiv.innerHTML+=`
-        <div class="clase">
-          <div>
-            <b>${c[0]}</b><br>
-            <span class="estado ${estado}">${c[1]}</span>
-          </div>
-        </div>`;
+      const seg=parseTiempo(c.t);
+      let estado="AUSENTE",cls="estado-bad";
+
+      if(c.p!=="AUSENTE"){
+        if(seg>=c.min){estado="PRESENTE";cls="estado-ok";pres++;}
+        else{estado="REVISAR";cls="estado-warn";}
+      }
+
+      const pct=Math.min(100,Math.round(seg/c.min*100));
+
+      tablaClases.innerHTML+=`
+        <tr>
+          <td>${c.n}</td>
+          <td class="${cls}">${estado}</td>
+          <td>${c.t||"-"}</td>
+          <td>${pct}%</td>
+        </tr>`;
+
+      Plotly.newPlot(c.div,[{
+        values:[pct,100-pct],
+        labels:["Conectado","Faltante"],
+        type:"pie",
+        hole:.6
+      }],{
+        title:c.n,
+        paper_bgcolor:"transparent",
+        font:{color:"#fff"},
+        showlegend:false
+      });
     });
 
-    Plotly.newPlot("grafico",[{
-      values:[pres,aus],
-      labels:["Presentes","Ausentes"],
-      type:"pie"
-    }],{paper_bgcolor:"transparent",font:{color:"#fff"}});
+    kAsistencia.innerText=`${pres}/${clases.length}`;
+    kPorcentaje.innerText=`${Math.round(pres/clases.length*100)}%`;
+    kMail.innerText=a["Mail enviado"];
+    kEstado.innerText=pres/clases.length>=0.75?"REGULAR":"EN RIESGO";
   });
 }
+
+const dCorreo=document.getElementById("d-correo");
+const dTelefono=document.getElementById("d-telefono");
+const dTwitch=document.getElementById("d-twitch");
+const dObs=document.getElementById("d-obs");
+const dMail=document.getElementById("d-mail");
+const kAsistencia=document.getElementById("k-asistencia");
+const kPorcentaje=document.getElementById("k-porcentaje");
+const kEstado=document.getElementById("k-estado");
+const kMail=document.getElementById("k-mail");
+
+const dniURL=new URLSearchParams(location.search).get("dni");
+if(dniURL){dniInput.value=dniURL;cargar();}
 </script>
 
 </body>
 </html>
-
