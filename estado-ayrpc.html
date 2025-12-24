@@ -17,7 +17,7 @@
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui,Segoe UI;
+  font-family:system-ui,Segoe UI,Arial;
   background:#060816;
   color:#eaeaf0;
 }
@@ -27,7 +27,7 @@ body{
   margin:auto;
 }
 .card{
-  background:rgba(20,25,60,.9);
+  background:rgba(20,25,60,.92);
   border:1px solid var(--neon);
   border-radius:14px;
   padding:16px;
@@ -35,10 +35,10 @@ body{
   box-shadow:0 0 18px rgba(108,99,255,.25);
 }
 h1,h2,h3{margin:0 0 10px}
+
 input,button{
   width:100%;
   padding:12px;
-  margin-top:8px;
   border-radius:10px;
   border:none;
   font-size:16px;
@@ -47,7 +47,9 @@ button{
   background:var(--neon);
   color:#fff;
   font-weight:bold;
+  cursor:pointer;
 }
+
 .kpis{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
@@ -59,7 +61,11 @@ button{
   padding:12px;
   text-align:center;
 }
-.kpi span{display:block;font-size:22px;font-weight:bold}
+.kpi span{
+  display:block;
+  font-size:22px;
+  font-weight:bold;
+}
 
 .datos{
   display:grid;
@@ -88,14 +94,6 @@ button{
   gap:16px;
 }
 </style>
-
-<script>
-document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("keydown",e=>{
-  if(e.ctrlKey && ["u","s","c","i","j"].includes(e.key.toLowerCase()))
-    e.preventDefault();
-});
-</script>
 </head>
 
 <body>
@@ -106,7 +104,7 @@ document.addEventListener("keydown",e=>{
 <div class="card" id="login">
   <h2>Ingresá tu DNI</h2>
   <input id="dniInput" type="number" placeholder="DNI sin puntos">
-  <button onclick="cargar()">Ver mi estado</button>
+  <button id="btnVer">Ver mi estado</button>
 </div>
 
 <div id="contenido" style="display:none">
@@ -116,7 +114,6 @@ document.addEventListener("keydown",e=>{
   <div class="kpis">
     <div class="kpi">Asistencia<span id="k-asistencia"></span></div>
     <div class="kpi">%<span id="k-porcentaje"></span></div>
-    <div class="kpi">Mail<span id="k-mail"></span></div>
     <div class="kpi">Estado<span id="k-estado"></span></div>
   </div>
 </div>
@@ -128,7 +125,6 @@ document.addEventListener("keydown",e=>{
     <div><b>Teléfono:</b> <span id="d-telefono"></span></div>
     <div><b>Usuario Twitch:</b> <span id="d-twitch"></span></div>
     <div><b>Observaciones:</b> <span id="d-obs"></span></div>
-    <div><b>Mail enviado:</b> <span id="d-mail"></span></div>
   </div>
 </div>
 
@@ -162,8 +158,11 @@ document.addEventListener("keydown",e=>{
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbXPHF_PgIolloJet5sR9EP8BF60XkmPpC/exec";
 
+const btn = document.getElementById("btnVer");
+btn.addEventListener("click", cargar);
+
 function parseTiempo(t){
-  if(!t||t==="AUSENTE") return 0;
+  if(!t || t==="AUSENTE") return 0;
   const h=/(\d+)h/.exec(t);
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
@@ -171,86 +170,84 @@ function parseTiempo(t){
 }
 
 function cargar(){
-  const dni=document.getElementById("dniInput").value;
-  fetch(API_URL+"?dni="+dni)
-  .then(r=>r.json())
-  .then(a=>{
-    if(a.error){alert(a.error);return;}
+  const dni = document.getElementById("dniInput").value;
+  if(!dni) return alert("Ingresá tu DNI");
 
-    login.style.display="none";
-    contenido.style.display="block";
+  fetch(API_URL + "?dni=" + dni)
+    .then(r => r.json())
+    .then(a => {
+      if(a.error){ alert(a.error); return; }
 
-    nombre.innerText=a["Nombre Completo"];
-    dCorreo.innerText=a["Correo"];
-    dTelefono.innerText=a["Teléfono (con Código de Área)"];
-    dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
-    dObs.innerText=a["Observaciones"]||"-";
-    dMail.innerText=a["Mail enviado"];
+      document.getElementById("login").style.display="none";
+      document.getElementById("contenido").style.display="block";
 
-    const clases=[
-      {n:"Primer Clase",p:a["1erClase – Presente"],t:a["1erClase – Tiempo"],min:(3*3600+10*60)*0.75,div:"g1"},
-      {n:"Segunda Clase",p:a["2daClase – Presente"],t:a["2daClase – Tiempo"],min:5100,div:"g2"},
-      {n:"Tercer Clase",p:a["3erClase – Presente"],t:a["3erClase – Tiempo"],min:5700,div:"g3"}
-    ];
+      document.getElementById("nombre").innerText = a["Nombre Completo"];
+      document.getElementById("d-correo").innerText = a["Correo"] || "-";
+      document.getElementById("d-telefono").innerText = a["Teléfono (con Código de Área)"] || "-";
+      document.getElementById("d-twitch").innerText =
+        a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"] || "-";
+      document.getElementById("d-obs").innerText = a["Observaciones"] || "-";
 
-    let pres=0;
-    tablaClases.innerHTML="";
+      const clases = [
+        {n:"Primer Clase", t:a["1erClase – Tiempo"], min:(3*3600+10*60)*0.75, div:"g1"},
+        {n:"Segunda Clase", t:a["2daClase – Tiempo"], min:5100, div:"g2"},
+        {n:"Tercer Clase", t:a["3erClase – Tiempo"], min:5700, div:"g3"}
+      ];
 
-    clases.forEach(c=>{
-      const seg=parseTiempo(c.t);
-      let estado="AUSENTE",cls="estado-bad";
+      let pres = 0;
+      const tbody = document.getElementById("tablaClases");
+      tbody.innerHTML = "";
 
-      if(c.p!=="AUSENTE"){
-        if(seg>=c.min){estado="PRESENTE";cls="estado-ok";pres++;}
-        else{estado="REVISAR";cls="estado-warn";}
-      }
+      clases.forEach(c=>{
+        const seg = parseTiempo(c.t);
+        let estado="AUSENTE", cls="estado-bad";
 
-      const pct=Math.min(100,Math.round(seg/c.min*100));
+        if(seg>0){
+          if(seg>=c.min){estado="PRESENTE";cls="estado-ok";pres++;}
+          else{estado="REVISAR";cls="estado-warn";}
+        }
 
-      tablaClases.innerHTML+=`
-        <tr>
-          <td>${c.n}</td>
-          <td class="${cls}">${estado}</td>
-          <td>${c.t||"-"}</td>
-          <td>${pct}%</td>
-        </tr>`;
+        const pct = Math.min(100, Math.round(seg/c.min*100));
 
-      Plotly.newPlot(c.div,[{
-        values:[pct,100-pct],
-        labels:["Conectado","Faltante"],
-        type:"pie",
-        hole:.6
-      }],{
-        title:c.n,
-        paper_bgcolor:"transparent",
-        font:{color:"#fff"},
-        showlegend:false
+        tbody.innerHTML += `
+          <tr>
+            <td>${c.n}</td>
+            <td class="${cls}">${estado}</td>
+            <td>${c.t || "-"}</td>
+            <td>${pct}%</td>
+          </tr>
+        `;
+
+        Plotly.newPlot(c.div,[{
+          values:[pct,100-pct],
+          labels:["Conectado","Faltante"],
+          type:"pie",
+          hole:.6
+        }],{
+          title:c.n,
+          paper_bgcolor:"transparent",
+          font:{color:"#fff"},
+          showlegend:false
+        });
       });
-    });
 
-    kAsistencia.innerText=`${pres}/${clases.length}`;
-    kPorcentaje.innerText=`${Math.round(pres/clases.length*100)}%`;
-    kMailKpi.innerText = a["Mail enviado"];
-    kEstado.innerText=pres/clases.length>=0.75?"REGULAR":"EN RIESGO";
-  });
+      document.getElementById("k-asistencia").innerText = pres + "/" + clases.length;
+      document.getElementById("k-porcentaje").innerText = Math.round(pres/clases.length*100) + "%";
+      document.getElementById("k-estado").innerText = pres/clases.length>=0.75 ? "REGULAR" : "EN RIESGO";
+    })
+    .catch(err=>{
+      alert("Error de conexión");
+      console.error(err);
+    });
 }
 
-const dCorreo   = document.getElementById("d-correo");
-const dTelefono = document.getElementById("d-telefono");
-const dTwitch   = document.getElementById("d-twitch");
-const dObs      = document.getElementById("d-obs");
-const dMail     = document.getElementById("d-mail");
-
-const kAsistencia = document.getElementById("k-asistencia");
-const kPorcentaje = document.getElementById("k-porcentaje");
-const kEstado     = document.getElementById("k-estado");
-const kMailKpi    = document.getElementById("k-mail");
-
-
-const dniURL=new URLSearchParams(location.search).get("dni");
-if(dniURL){dniInput.value=dniURL;cargar();}
+// Auto DNI por URL
+const dniURL = new URLSearchParams(location.search).get("dni");
+if(dniURL){
+  document.getElementById("dniInput").value = dniURL;
+  cargar();
+}
 </script>
 
 </body>
 </html>
-
