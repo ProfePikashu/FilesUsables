@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AyRPC – Estado del Alumno</title>
+
+<script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+<style>
+:root{
+  --neon:#6c63ff;
+  --ok:#3cff8f;
+  --warn:#ffd84c;
+  --bad:#ff4c4c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI;
+  background:#060816;
+  color:#eaeaf0;
+}
+.container{
+  padding:16px;
+  max-width:900px;
+  margin:auto;
+}
+.card{
+  background:rgba(20,25,60,.85);
+  border:1px solid var(--neon);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 0 20px rgba(108,99,255,.25);
+  animation:fadeIn .6s ease;
+}
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
+}
+h1,h2{margin:0 0 10px}
+input,button{
+  width:100%;
+  padding:12px;
+  margin-top:8px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+button{
+  background:var(--neon);
+  color:#fff;
+  font-weight:bold;
+}
+.kpis, .clases{
+  display:grid;
+  gap:12px;
+}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+.kpi{
+  background:#0d1230;
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+}
+.kpi span{display:block;font-size:22px;font-weight:bold}
+.clase{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  background:#0d1230;
+  border-radius:12px;
+  padding:12px;
+}
+.estado.OK{color:var(--ok)}
+.estado.WARN{color:var(--warn)}
+.estado.BAD{color:var(--bad)}
+</style>
+
+<script>
+// 🔒 Bloqueos básicos
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("keydown",e=>{
+  if(
+    e.ctrlKey && ["u","s","c","i","j"].includes(e.key.toLowerCase())
+  ) e.preventDefault();
+});
+</script>
+</head>
+
+<body>
+<div class="container">
+
+<h1>⚡ AyRPC – Estado Académico</h1>
+
+<div class="card" id="login">
+  <h2>Ingresá tu DNI</h2>
+  <input id="dniInput" type="number" placeholder="DNI">
+  <button onclick="cargar()">Ver mi estado</button>
+</div>
+
+<div class="card" id="panel" style="display:none">
+  <h2 id="nombre"></h2>
+  <div class="kpis" id="kpis"></div>
+</div>
+
+<div class="card" id="panelClases" style="display:none">
+  <h2>Situación por clase</h2>
+  <div class="clases" id="clases"></div>
+</div>
+
+<div class="card" id="panelGrafico" style="display:none">
+  <div id="grafico"></div>
+</div>
+
+</div>
+
+<script>
+const API_URL="PEGÁ_ACÁ_TU_URL_DE_APPS_SCRIPT";
+
+const dniURL=new URLSearchParams(location.search).get("dni");
+if(dniURL){document.getElementById("dniInput").value=dniURL; cargar();}
+
+function cargar(){
+  const dni=document.getElementById("dniInput").value;
+  fetch(API_URL+"?dni="+dni)
+  .then(r=>r.json())
+  .then(a=>{
+    if(a.error){alert(a.error);return;}
+
+    document.getElementById("login").style.display="none";
+    panel.style.display="block";
+    panelClases.style.display="block";
+    panelGrafico.style.display="block";
+
+    nombre.innerText=a["Nombre Completo"];
+
+    const clases=[
+      ["1er Clase",a["1erClase – Presente"]],
+      ["2da Clase",a["2daClase – Presente"]],
+      ["3er Clase",a["3erClase – Presente"]],
+    ];
+
+    let pres=0,aus=0;
+    clases.forEach(c=>c[1]==="PRESENTE"?pres++:aus++);
+
+    kpis.innerHTML=`
+      <div class="kpi">Asistencia<span>${pres}/3</span></div>
+      <div class="kpi">%<span>${Math.round(pres/3*100)}%</span></div>
+      <div class="kpi">Mail<span>${a["Mail enviado"]}</span></div>
+      <div class="kpi">Estado<span>${pres/3>=0.75?"REGULAR":"RIESGO"}</span></div>
+    `;
+
+    clasesDiv.innerHTML="";
+    clases.forEach(c=>{
+      const estado=c[1]==="PRESENTE"?"OK":"BAD";
+      clasesDiv.innerHTML+=`
+        <div class="clase">
+          <div>
+            <b>${c[0]}</b><br>
+            <span class="estado ${estado}">${c[1]}</span>
+          </div>
+        </div>`;
+    });
+
+    Plotly.newPlot("grafico",[{
+      values:[pres,aus],
+      labels:["Presentes","Ausentes"],
+      type:"pie"
+    }],{paper_bgcolor:"transparent",font:{color:"#fff"}});
+  });
+}
+</script>
+
+</body>
+</html>
