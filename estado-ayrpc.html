@@ -54,18 +54,24 @@ button{
 /* BOTON VOLVER */
 #btnVolver{
   position:fixed;
-  top:12px;
-  left:12px;
-  padding:6px 12px;
-  font-size:13px;
-  border-radius:8px;
-  background:#2b2f6a;
+  top:10px;
+  left:10px;
+  padding:4px 10px;
+  font-size:12px;
+  border-radius:6px;
+  background:rgba(20,25,60,.95);
   color:#fff;
   border:1px solid var(--neon);
   cursor:pointer;
   display:none;
   z-index:999;
+  box-shadow:0 0 10px rgba(108,99,255,.35);
 }
+
+#btnVolver:hover{
+  background:var(--neon);
+}
+
 
 .kpis{
   display:grid;
@@ -294,3 +300,4 @@ function volver(){
 
 </body>
 </html>
+
