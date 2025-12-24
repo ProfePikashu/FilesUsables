@@ -60,7 +60,6 @@ button{
   left:12px;
   padding:4px 10px;
   font-size:12px;
-  line-height:1;
   display:none;
   background:rgba(20,25,60,.92);
   color:#fff;
@@ -112,18 +111,14 @@ button{
 .estado-bad{color:var(--bad);font-weight:bold}
 .estado-neutral{color:var(--neutral);font-weight:bold}
 
-/* === GRAFICOS (ANTI SUPERPOSICION) === */
+/* GRAFICOS */
 .graficos{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:32px;
 }
-
 .graficos > div{
-  width:100%;
-  min-height:320px;        /* 🔒 altura real */
-  position:relative;
-  overflow:hidden;         /* 🔒 nada sale */
+  min-height:160px;
 }
 </style>
 </head>
@@ -170,7 +165,7 @@ button{
         <th>Clase</th>
         <th>Situación</th>
         <th>Tiempo</th>
-        <th>% Conectado</th>
+        <th>%</th>
       </tr>
     </thead>
     <tbody id="tablaClases"></tbody>
@@ -188,36 +183,51 @@ button{
 <script>
 const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-const nombre=d=document.getElementById("nombre");
-const dCorreo=document.getElementById("d-correo");
-const dTelefono=document.getElementById("d-telefono");
-const dTwitch=document.getElementById("d-twitch");
-const dObs=document.getElementById("d-obs");
-const kAsistencia=document.getElementById("k-asistencia");
-const kPorcentaje=document.getElementById("k-porcentaje");
-const kEstado=document.getElementById("k-estado");
-const tablaClases=document.getElementById("tablaClases");
-const graficos=document.getElementById("graficos");
-const login=document.getElementById("login");
-const contenido=document.getElementById("contenido");
-const dniInput=document.getElementById("dniInput");
-const btnVolver=document.getElementById("btnVolver");
+const CFG={
+  "1er":{total:11400,min:8550},
+  "2da":{total:6800,min:5100},
+  "3er":{total:7600,min:5700}
+};
 
 btnVer.onclick=cargar;
 
-function plotSeguro(el,data,title){
-  Plotly.newPlot(el,data,{
-    autosize:true,
-    height:260,
-    margin:{t:40,b:20,l:20,r:20},
+function parseTiempo(t){
+  if(!t)return 0;
+  const h=/(\d+)h/.exec(t);
+  const m=/(\d+)m/.exec(t);
+  const s=/(\d+)s/.exec(t);
+  return (h?+h[1]:0)*3600+(m?+m[1]:0)*60+(s?+s[1]:0);
+}
+
+function barra(el,cfg,real,titulo){
+  let color=cfg.min<=real?"#3cff8f":real>=cfg.min*0.85?"#ffd84c":"#ff4c4c";
+  Plotly.newPlot(el,[{
+    type:"bar",
+    orientation:"h",
+    x:[Math.round(real/60)],
+    y:[""],
+    marker:{color}
+  }],{
+    title:{text:titulo,font:{size:14}},
+    xaxis:{range:[0,Math.round(cfg.total/60)],fixedrange:true},
+    yaxis:{visible:false,fixedrange:true},
+    shapes:[{
+      type:"line",
+      x0:Math.round(cfg.min/60),
+      x1:Math.round(cfg.min/60),
+      y0:-0.5,
+      y1:0.5,
+      line:{color:"#fff",dash:"dot"}
+    }],
+    height:140,
+    margin:{l:30,r:20,t:40,b:20},
     paper_bgcolor:"transparent",
     plot_bgcolor:"transparent",
     showlegend:false,
-    font:{color:"#fff"},
-    title:{text:title,font:{size:14}}
+    font:{color:"#fff"}
   },{
-    responsive:true,
-    displayModeBar:false
+    displayModeBar:false,
+    responsive:true
   });
 }
 
@@ -237,12 +247,30 @@ function cargar(){
 
     tablaClases.innerHTML="";
     graficos.innerHTML="";
+    let ok=0;
 
-    ["Primer","Segunda","Tercer","Cuarta","Quinta","Sexta","Última"].forEach((n,i)=>{
-      const div=document.createElement("div");
-      graficos.appendChild(div);
-      plotSeguro(div,[{values:[100],labels:[""],type:"pie",hole:.65}],n+" Clase");
+    ["1er","2da","3er"].forEach((k,i)=>{
+      const t=parseTiempo(a[k+"Clase – Tiempo"]);
+      const pct=Math.round(t/CFG[k].total*100);
+      const estado=t>=CFG[k].min?"PRESENTE":"REVISAR";
+      if(t>=CFG[k].min) ok++;
+
+      tablaClases.innerHTML+=`
+        <tr>
+          <td>${k}</td>
+          <td class="${t>=CFG[k].min?"estado-ok":"estado-warn"}">${estado}</td>
+          <td>${a[k+"Clase – Tiempo"]}</td>
+          <td>${pct}%</td>
+        </tr>`;
+
+      const d=document.createElement("div");
+      graficos.appendChild(d);
+      barra(d,CFG[k],t,k+" Clase");
     });
+
+    kAsistencia.innerText=ok+"/3";
+    kPorcentaje.innerText=Math.round(ok/3*100)+"%";
+    kEstado.innerText=ok/3>=0.75?"REGULAR":"EN RIESGO";
   });
 }
 
@@ -250,14 +278,7 @@ function volver(){
   contenido.style.display="none";
   login.style.display="block";
   btnVolver.style.display="none";
-  dniInput.value="";
 }
-
-window.addEventListener("resize",()=>{
-  document.querySelectorAll(".graficos > div").forEach(d=>{
-    if(d.data) Plotly.Plots.resize(d);
-  });
-});
 </script>
 
 </body>
