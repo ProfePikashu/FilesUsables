@@ -472,7 +472,15 @@ function volver(){
   contenido.style.display="none";
   login.style.display="block";
   btnVolver.style.display="none";
+
+  // Cierra cronograma si estaba abierto
+  cronogramaPanel.classList.remove('open');
+  document.body.style.overflow = "";
+
+  // Oculta botón cronograma otra vez
+  btnCronograma.style.display = "none";
 }
+
 </script>
 
 <!-- BOTÓN CRONOGRAMA -->
@@ -535,6 +543,7 @@ function toggleCronograma() {
 
 </body>
 </html>
+
 
 
 
