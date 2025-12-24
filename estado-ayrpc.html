@@ -8,7 +8,7 @@
 <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
 <style>
-/* === (ESTILOS SIN TOCAR) === */
+/* === CSS ORIGINAL INTACTO === */
 :root{
   --neon:#6c63ff;
   --ok:#3cff8f;
@@ -127,37 +127,31 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 <div id="cronogramaPanel" class="cronograma-panel"></div>
 
 <script>
-/* === DOM (DECLARADO TODO ANTES) === */
-const btnVer = document.getElementById("btnVer");
-const btnVolver = document.getElementById("btnVolver");
-const btnCronograma = document.getElementById("btnCronograma");
-const cronogramaPanel = document.getElementById("cronogramaPanel");
-const cronogramaOverlay = document.getElementById("cronogramaOverlay");
+/* === DOM === */
+const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-const dniInput = document.getElementById("dniInput");
-const login = document.getElementById("login");
-const contenido = document.getElementById("contenido");
+const btnVer=document.getElementById("btnVer");
+const btnVolver=document.getElementById("btnVolver");
+const btnCronograma=document.getElementById("btnCronograma");
+const cronogramaPanel=document.getElementById("cronogramaPanel");
+const cronogramaOverlay=document.getElementById("cronogramaOverlay");
 
-const nombre = document.getElementById("nombre");
-const dCorreo = document.getElementById("d-correo");
-const dTelefono = document.getElementById("d-telefono");
-const dTwitch = document.getElementById("d-twitch");
-const dObs = document.getElementById("d-obs");
+const dniInput=document.getElementById("dniInput");
+const login=document.getElementById("login");
+const contenido=document.getElementById("contenido");
 
-const kAsistencia = document.getElementById("k-asistencia");
-const kPorcentaje = document.getElementById("k-porcentaje");
-const kEstado = document.getElementById("k-estado");
+const nombre=document.getElementById("nombre");
+const dCorreo=document.getElementById("d-correo");
+const dTelefono=document.getElementById("d-telefono");
+const dTwitch=document.getElementById("d-twitch");
+const dObs=document.getElementById("d-obs");
 
-const tablaClases = document.getElementById("tablaClases");
-const graficos = document.getElementById("graficos");
+const kAsistencia=document.getElementById("k-asistencia");
+const kPorcentaje=document.getElementById("k-porcentaje");
+const kEstado=document.getElementById("k-estado");
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwkePWjJYOgtwNbrfzFW7bA_jwcJd-p1VflvYs087BC3zGKta0WsdDEsqstj7nUEUWC/exec";
-
-const CFG={
-  "1er":{total:11400,min:8550},
-  "2da":{total:6800,min:5100},
-  "3er":{total:7600,min:5700}
-};
+const tablaClases=document.getElementById("tablaClases");
+const graficos=document.getElementById("graficos");
 
 const ORDEN=[
   {n:"Primer Clase",k:"1er"},
@@ -169,16 +163,8 @@ const ORDEN=[
   {n:"Última Clase",k:"Ultima"}
 ];
 
-btnVer.onclick = cargar;
-btnVolver.onclick = volver;
-
-function parseTiempo(t){
-  if(!t) return 0;
-  const h=/(\d+)h/.exec(t);
-  const m=/(\d+)m/.exec(t);
-  const s=/(\d+)s/.exec(t);
-  return (h?+h[1]:0)*3600+(m?+m[1]:0)*60+(s?+s[1]:0);
-}
+btnVer.onclick=cargar;
+btnVolver.onclick=volver;
 
 function cargar(){
   fetch(API_URL+"?dni="+dniInput.value)
@@ -207,7 +193,13 @@ function cargar(){
       const tiempo=a[item.k+"Clase – Tiempo"]||"-";
       if(i<3 && (estado==="PRESENTE"||estado==="RECUPERADA")) totalValidas++;
 
-      tablaClases.innerHTML+=`<tr><td>${item.n}</td><td>${estado}</td><td>${tiempo}</td></tr>`;
+      tablaClases.innerHTML+=`
+        <tr>
+          <td>${item.n}</td>
+          <td>${estado}</td>
+          <td>${tiempo}</td>
+          <td>-</td>
+        </tr>`;
     });
 
     kAsistencia.innerText=totalValidas+"/3";
@@ -221,10 +213,10 @@ function volver(){
   login.style.display="block";
   btnVolver.style.display="none";
   btnCronograma.style.display="none";
+  cronogramaPanel.classList.remove("open");
+  cronogramaOverlay.style.display="none";
 }
 </script>
 
 </body>
 </html>
-
-
