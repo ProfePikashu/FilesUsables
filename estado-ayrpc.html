@@ -479,20 +479,8 @@ ORDEN.forEach((item, index) => {
   }
 });
 
-
-  // KPI basado SOLO en la situación del Sheet
-  const estadosValidos = ["PRESENTE", "RECUPERADA"];
-
-  let totalValidas = 0;
-
-  // evaluamos solo las primeras 3 clases
-  ["1er","2da","3er"].forEach(k => {
-    const est = (a[k + "Clase – Presente"] || "").toUpperCase();
-    if (estadosValidos.includes(est)) totalValidas++;
-  });
-
   // Asistencia
- kAsistencia.innerText = totalValidas + "/3";
+kAsistencia.innerText = totalValidas + "/3";
 kPorcentaje.innerText = Math.round((totalValidas / 3) * 100) + "%";
 
 if (totalValidas === 0) {
@@ -598,6 +586,7 @@ cronogramaHeader.addEventListener('click', cerrarCronograma);
 
 </body>
 </html>
+
 
 
 
