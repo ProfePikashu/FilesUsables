@@ -257,6 +257,15 @@ button{
   width:auto !important;
 }
 
+  /* Overlay para cerrar cronograma */
+#cronogramaOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  z-index:1000;
+  display:none;
+}
+
 </style>
   
 </head>
@@ -503,12 +512,13 @@ function volver(){
   📘 Cronograma<br>y Temario
 </button>
 
+<div id="cronogramaOverlay"></div>
+  
 <!-- PANEL CRONOGRAMA -->
 <div id="cronogramaPanel" class="cronograma-panel">
   <div class="cronograma-header">
     <h3>📘 Cronograma y Temario</h3>
     <span class="cronograma-hora">Siempre a las 19:30 hs</span>
-    <button class="cronograma-close" onclick="toggleCronograma()">✕</button>
   </div>
 
   <div class="cronograma-content">
@@ -543,21 +553,33 @@ function volver(){
 </div>
 
 <script>
-  const cronogramaPanel = document.getElementById('cronogramaPanel');
-  const btnCronograma = document.getElementById('btnCronograma');
+const cronogramaPanel = document.getElementById('cronogramaPanel');
+const btnCronograma = document.getElementById('btnCronograma');
+const cronogramaOverlay = document.getElementById('cronogramaOverlay');
+const cronogramaHeader = cronogramaPanel.querySelector('.cronograma-header');
 
-function toggleCronograma() {
-  const abierto = cronogramaPanel.classList.toggle('open');
-  document.body.style.overflow = abierto ? "hidden" : "";
+function abrirCronograma(){
+  cronogramaPanel.classList.add('open');
+  cronogramaOverlay.style.display = 'block';
+  document.body.style.overflow = 'hidden';
 }
 
+function cerrarCronograma(){
+  cronogramaPanel.classList.remove('open');
+  cronogramaOverlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
 
-  btnCronograma.addEventListener('click', toggleCronograma);
+btnCronograma.addEventListener('click', abrirCronograma);
+cronogramaOverlay.addEventListener('click', cerrarCronograma);
+cronogramaHeader.addEventListener('click', cerrarCronograma);
 </script>
+
 
 
 </body>
 </html>
+
 
 
 
