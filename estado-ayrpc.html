@@ -151,6 +151,7 @@ button{
   font-weight: bold;
   border-radius: 8px 0 0 8px;
   box-shadow: 0 0 15px rgba(106,0,255,.6);
+  display:none;
 }
 
 .cronograma-panel {
@@ -235,6 +236,12 @@ button{
 .clase.ultima {
   border: 1px solid #ff4d4d;
 }
+
+  /* FIX cronograma: evita barra horizontal gigante */
+#btnCronograma{
+  width:auto !important;
+}
+
 </style>
   
 </head>
@@ -409,6 +416,7 @@ function cargar(){
     login.style.display="none";
     contenido.style.display="block";
     btnVolver.style.display="block";
+    btnCronograma.style.display = "block";
 
     nombre.innerText=a["Nombre Completo"]||"-";
     dCorreo.innerText=a["Correo"]||"-";
@@ -515,9 +523,11 @@ function volver(){
   const cronogramaPanel = document.getElementById('cronogramaPanel');
   const btnCronograma = document.getElementById('btnCronograma');
 
-  function toggleCronograma() {
-    cronogramaPanel.classList.toggle('open');
-  }
+function toggleCronograma() {
+  const abierto = cronogramaPanel.classList.toggle('open');
+  document.body.style.overflow = abierto ? "hidden" : "";
+}
+
 
   btnCronograma.addEventListener('click', toggleCronograma);
 </script>
@@ -525,6 +535,7 @@ function volver(){
 
 </body>
 </html>
+
 
 
 
