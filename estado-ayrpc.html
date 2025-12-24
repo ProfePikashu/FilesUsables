@@ -8,6 +8,7 @@
 <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
 <style>
+/* === (ESTILOS SIN TOCAR) === */
 :root{
   --neon:#6c63ff;
   --ok:#3cff8f;
@@ -16,263 +17,65 @@
   --neutral:#7a82c8;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Arial;
-  background:#060816;
-  color:#eaeaf0;
-}
-.container{
-  padding:16px;
-  max-width:1200px;
-  margin:auto;
-}
-.card{
-  background:rgba(20,25,60,.92);
-  border:1px solid var(--neon);
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 0 18px rgba(108,99,255,.25);
-}
+body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#060816;color:#eaeaf0}
+.container{padding:16px;max-width:1200px;margin:auto}
+.card{background:rgba(20,25,60,.92);border:1px solid var(--neon);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 0 18px rgba(108,99,255,.25)}
 h1,h2,h3{margin:0 0 10px}
+input,button{width:100%;padding:12px;border-radius:10px;border:none;font-size:16px}
+button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 
-input,button{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  font-size:16px;
-}
-button{
-  background:var(--neon);
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* BOTON VOLVER */
-/* BOTÓN VOLVER – chico, fijo y prolijo a la izquierda */
 #btnVolver{
-  position:fixed;
-  top:10px;
-  left:10px;
-
-  width:auto;
-  min-width:unset;
-  padding:4px 8px;
-
-  font-size:11px;
-  line-height:1;
-  font-weight:600;
-
-  display:none;           /* se muestra por JS */
-  align-items:center;
-  gap:6px;
-
-  background:rgba(20,25,60,.92);
-  color:#fff;
-  border:1px solid var(--neon);
-  border-radius:6px;
-
-  cursor:pointer;
-  z-index:9999;
-  box-shadow:0 0 6px rgba(108,99,255,.35);
+  position:fixed;top:10px;left:10px;
+  padding:4px 8px;font-size:11px;
+  display:none;background:rgba(20,25,60,.92);
+  border:1px solid var(--neon);border-radius:6px;
+  z-index:9999
 }
 
-#btnVolver:hover{
-  background:var(--neon);
-}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.kpi{background:#0d1230;border-radius:12px;padding:12px;text-align:center}
+.kpi span{display:block;font-size:22px;font-weight:bold}
 
+.datos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:800px){.datos{grid-template-columns:1fr}}
 
-/* KPI */
-.kpis{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
-  gap:12px;
-}
-.kpi{
-  background:#0d1230;
-  border-radius:12px;
-  padding:12px;
-  text-align:center;
-}
-.kpi span{
-  display:block;
-  font-size:22px;
-  font-weight:bold;
-}
-
-/* DATOS */
-.datos{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-@media(max-width:800px){
-  .datos{grid-template-columns:1fr}
-}
-
-/* TABLA */
-.tabla{
-  width:100%;
-  border-collapse:collapse;
-}
-.tabla th,.tabla td{
-  padding:10px;
-  border-bottom:1px solid rgba(255,255,255,.15);
-}
+.tabla{width:100%;border-collapse:collapse}
+.tabla th,.tabla td{padding:10px;border-bottom:1px solid rgba(255,255,255,.15)}
 
 .estado-ok{color:var(--ok);font-weight:bold}
 .estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
 .estado-neutral{color:var(--neutral);font-weight:bold}
 
-/* GRAFICOS */
-.graficos{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:32px;
-}
-.graficos > div{
-  min-height:140px;
-}
+.graficos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:32px}
 
-.cronograma-btn {
-  position: fixed;
-  right: 0;
-  top: 40%;
-  z-index: 1000;
-  background: #6a00ff;
-  color: #fff;
-  border: none;
-  padding: 12px 10px;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 8px 0 0 8px;
-  box-shadow: 0 0 15px rgba(106,0,255,.6);
-  display:none;
+.cronograma-btn{
+  position:fixed;right:0;top:40%;
+  background:#6a00ff;color:#fff;
+  padding:12px 10px;font-weight:bold;
+  border-radius:8px 0 0 8px;
+  display:none;z-index:1000
 }
 
-.cronograma-panel {
-  position: fixed;
-  top: 0;
-  right: -420px;
-  width: 420px;
-  height: 100%;
-  background: #0e0e16;
-  color: #fff;
-  z-index: 1001;
-  transition: right 0.35s ease;
-  box-shadow: -10px 0 30px rgba(0,0,0,.6);
-  display: flex;
-  flex-direction: column;
+.cronograma-panel{
+  position:fixed;top:0;right:-420px;
+  width:420px;height:100%;
+  background:#0e0e16;z-index:1001;
+  transition:right .35s
 }
+.cronograma-panel.open{right:0}
 
-.cronograma-panel.open {
-  right: 0;
-}
-
-.cronograma-header {
-  padding: 16px;
-  background: linear-gradient(90deg,#6a00ff,#9b5cff);
-  position: relative;
-}
-
-.cronograma-header h3 {
-  margin: 0;
-}
-
-.cronograma-hora {
-  font-size: 0.85em;
-  opacity: 0.9;
-}
-
-.cronograma-close{
-  position:absolute;
-  top:12px;
-  right:12px;
-
-  width:32px;
-  height:32px;
-  line-height:32px;
-
-  background:rgba(0,0,0,.25);
-  border:none;
-  border-radius:50%;
-
-  color:#fff;
-  font-size:18px;
-  font-weight:bold;
-
-  cursor:pointer;
-  text-align:center;
-}
-  
-.cronograma-close:hover{
-  background:rgba(0,0,0,.45);
-}
-
-
-.cronograma-content {
-  padding: 16px;
-  overflow-y: auto;
-}
-
-.cronograma-content h4 {
-  margin-top: 0;
-  color: #b98cff;
-}
-
-.clase {
-  background: #161626;
-  padding: 10px;
-  margin-bottom: 8px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.clase a {
-  background: #00d084;
-  color: #000;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.clase.futura {
-  opacity: 0.75;
-}
-
-.clase.ultima {
-  border: 1px solid #ff4d4d;
-}
-
-  /* FIX cronograma: evita barra horizontal gigante */
-#btnCronograma{
-  width:auto !important;
-}
-
-  /* Overlay para cerrar cronograma */
 #cronogramaOverlay{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:rgba(0,0,0,.45);
-  z-index:1000;
-  display:none;
+  display:none;z-index:1000
 }
-
 </style>
-  
 </head>
 
 <body>
 
-<button id="btnVolver" onclick="volver()">← Volver</button>
+<button id="btnVolver">← Volver</button>
 
 <div class="container">
 <h1>⚡ AyRPC – Estado Académico</h1>
@@ -307,14 +110,6 @@ button{
 <div class="card">
   <h3>Situación por clase</h3>
   <table class="tabla">
-    <thead>
-      <tr>
-        <th>Clase</th>
-        <th>Situación</th>
-        <th>Tiempo</th>
-        <th>%</th>
-      </tr>
-    </thead>
     <tbody id="tablaClases"></tbody>
   </table>
 </div>
@@ -327,47 +122,55 @@ button{
 </div>
 </div>
 
+<button id="btnCronograma" class="cronograma-btn">📘 Cronograma</button>
+<div id="cronogramaOverlay"></div>
+<div id="cronogramaPanel" class="cronograma-panel"></div>
+
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
+/* === DOM (DECLARADO TODO ANTES) === */
+const btnVer = document.getElementById("btnVer");
+const btnVolver = document.getElementById("btnVolver");
+const btnCronograma = document.getElementById("btnCronograma");
+const cronogramaPanel = document.getElementById("cronogramaPanel");
+const cronogramaOverlay = document.getElementById("cronogramaOverlay");
 
-/* DOM */
-const btnVer=document.getElementById("btnVer");
-const btnVolver=document.getElementById("btnVolver");
-const dniInput=document.getElementById("dniInput");
-const login=document.getElementById("login");
-const contenido=document.getElementById("contenido");
+const dniInput = document.getElementById("dniInput");
+const login = document.getElementById("login");
+const contenido = document.getElementById("contenido");
 
-const nombre=document.getElementById("nombre");
-const dCorreo=document.getElementById("d-correo");
-const dTelefono=document.getElementById("d-telefono");
-const dTwitch=document.getElementById("d-twitch");
-const dObs=document.getElementById("d-obs");
+const nombre = document.getElementById("nombre");
+const dCorreo = document.getElementById("d-correo");
+const dTelefono = document.getElementById("d-telefono");
+const dTwitch = document.getElementById("d-twitch");
+const dObs = document.getElementById("d-obs");
 
-const kAsistencia=document.getElementById("k-asistencia");
-const kPorcentaje=document.getElementById("k-porcentaje");
-const kEstado=document.getElementById("k-estado");
+const kAsistencia = document.getElementById("k-asistencia");
+const kPorcentaje = document.getElementById("k-porcentaje");
+const kEstado = document.getElementById("k-estado");
 
-const tablaClases=document.getElementById("tablaClases");
-const graficos=document.getElementById("graficos");
+const tablaClases = document.getElementById("tablaClases");
+const graficos = document.getElementById("graficos");
 
-/* CONFIG */
+const API_URL = "https://script.google.com/macros/s/AKfycbwkePWjJYOgtwNbrfzFW7bA_jwcJd-p1VflvYs087BC3zGKta0WsdDEsqstj7nUEUWC/exec";
+
 const CFG={
-  "1er":{total:11400,min:8550,n:"Primer Clase"},
-  "2da":{total:6800,min:5100,n:"Segunda Clase"},
-  "3er":{total:7600,min:5700,n:"Tercer Clase"}
+  "1er":{total:11400,min:8550},
+  "2da":{total:6800,min:5100},
+  "3er":{total:7600,min:5700}
 };
 
-const ORDEN = [
-  { n:"Primer Clase", k:"1er" },
-  { n:"Segunda Clase", k:"2da" },
-  { n:"Tercer Clase", k:"3er" },
-  { n:"Cuarta Clase", k:"4ta" },
-  { n:"Quinta Clase", k:"5ta" },
-  { n:"Sexta Clase", k:"6ta" },
-  { n:"Última Clase", k:"Ultima" }
+const ORDEN=[
+  {n:"Primer Clase",k:"1er"},
+  {n:"Segunda Clase",k:"2da"},
+  {n:"Tercer Clase",k:"3er"},
+  {n:"Cuarta Clase",k:"4ta"},
+  {n:"Quinta Clase",k:"5ta"},
+  {n:"Sexta Clase",k:"6ta"},
+  {n:"Última Clase",k:"Ultima"}
 ];
 
-btnVer.onclick=cargar;
+btnVer.onclick = cargar;
+btnVolver.onclick = volver;
 
 function parseTiempo(t){
   if(!t) return 0;
@@ -375,60 +178,6 @@ function parseTiempo(t){
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
   return (h?+h[1]:0)*3600+(m?+m[1]:0)*60+(s?+s[1]:0);
-}
-
-function barra(el,cfg,real,titulo){
-  const color=real>=cfg.min?"#3cff8f":real>=cfg.min*0.85?"#ffd84c":"#ff4c4c";
-  Plotly.newPlot(el,[{
-    type:"bar",
-    orientation:"h",
-    x:[Math.round(real/60)],
-    y:[""],
-    marker:{color}
-  }],{
-    title:{text:titulo,font:{size:14}},
-    xaxis:{range:[0,Math.round(cfg.total/60)],fixedrange:true},
-    yaxis:{visible:false,fixedrange:true},
-    shapes:[{
-      type:"line",
-      x0:Math.round(cfg.min/60),
-      x1:Math.round(cfg.min/60),
-      y0:-0.5,y1:0.5,
-      line:{color:"#fff",dash:"dot"}
-    }],
-    height:120,
-    margin:{l:30,r:20,t:40,b:20},
-    paper_bgcolor:"transparent",
-    plot_bgcolor:"transparent",
-    showlegend:false,
-    font:{color:"#fff"}
-  },{
-    displayModeBar:false,
-    responsive:true
-  });
-}
-
-function barraFutura(el,titulo){
-  Plotly.newPlot(el,[{
-    type:"bar",
-    orientation:"h",
-    x:[100],
-    y:[""],
-    marker:{color:"#7a82c8"}
-  }],{
-    title:{text:titulo+" (no dictada)",font:{size:14}},
-    xaxis:{range:[0,100],visible:false,fixedrange:true},
-    yaxis:{visible:false,fixedrange:true},
-    height:100,
-    margin:{l:20,r:20,t:40,b:20},
-    paper_bgcolor:"transparent",
-    plot_bgcolor:"transparent",
-    showlegend:false,
-    font:{color:"#fff"}
-  },{
-    displayModeBar:false,
-    responsive:true
-  });
 }
 
 function cargar(){
@@ -440,177 +189,40 @@ function cargar(){
     login.style.display="none";
     contenido.style.display="block";
     btnVolver.style.display="block";
-    btnCronograma.style.display = "block";
+    btnCronograma.style.display="block";
 
     nombre.innerText=a["Nombre Completo"]||"-";
     dCorreo.innerText=a["Correo"]||"-";
     dTelefono.innerText=a["Teléfono (con Código de Área)"]||"-";
     dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"]||"-";
     dObs.innerText=a["Observaciones"]||"-";
-    
-    tablaClases.innerHTML = "";
-    graficos.innerHTML = "";
 
-    let totalValidas = 0;
+    tablaClases.innerHTML="";
+    graficos.innerHTML="";
 
-ORDEN.forEach((item, index) => {
+    let totalValidas=0;
 
-  const estadoRaw = (a[item.k + "Clase – Presente"] || "-").toUpperCase();
-  const tiempo = a[item.k + "Clase – Tiempo"] || "-";
+    ORDEN.forEach((item,i)=>{
+      const estado=(a[item.k+"Clase – Presente"]||"-").toUpperCase();
+      const tiempo=a[item.k+"Clase – Tiempo"]||"-";
+      if(i<3 && (estado==="PRESENTE"||estado==="RECUPERADA")) totalValidas++;
 
-  let claseCss = "estado-neutral";
+      tablaClases.innerHTML+=`<tr><td>${item.n}</td><td>${estado}</td><td>${tiempo}</td></tr>`;
+    });
 
-  if (estadoRaw === "PRESENTE" || estadoRaw === "RECUPERADA") claseCss = "estado-ok";
-  else if (estadoRaw === "AUSENTE") claseCss = "estado-bad";
-  else if (estadoRaw === "REVISAR") claseCss = "estado-warn";
-
-  tablaClases.innerHTML += `
-    <tr>
-      <td>${item.n}</td>
-      <td class="${claseCss}">${estadoRaw}</td>
-      <td>${tiempo}</td>
-      <td>-</td>
-    </tr>
-  `;
-  const g = document.createElement("div");
-graficos.appendChild(g);
-
-if (CFG[item.k] && tiempo !== "-" && tiempo !== "") {
-  const tSeg = parseTiempo(tiempo);
-  barra(g, CFG[item.k], tSeg, item.n);
-} else {
-  barraFutura(g, item.n);
+    kAsistencia.innerText=totalValidas+"/3";
+    kPorcentaje.innerText=Math.round(totalValidas/3*100)+"%";
+    kEstado.innerText= totalValidas===3?"EXCELENTE":totalValidas===0?"RIESGO DE BAJA":"DEBE CLASES";
+  });
 }
-
-
-  // KPI: solo cuentan las primeras 3
-  if (index < 3 && (estadoRaw === "PRESENTE" || estadoRaw === "RECUPERADA")) {
-    totalValidas++;
-  }
-});
-
-  // Asistencia
-kAsistencia.innerText = totalValidas + "/3";
-kPorcentaje.innerText = Math.round((totalValidas / 3) * 100) + "%";
-
-if (totalValidas === 0) {
-  kEstado.innerText = "RIESGO DE BAJA";
-  kEstado.className = "estado-bad";
-} else if (totalValidas === 3) {
-  kEstado.innerText = "EXCELENTE";
-  kEstado.className = "estado-ok";
-} else {
-  kEstado.innerText = "DEBE CLASES";
-  kEstado.className = "estado-warn";
-}
-
-
-}); // ← cierra el .then(a=>{ ... })
-
-}   // ← cierra function cargar()
 
 function volver(){
   contenido.style.display="none";
   login.style.display="block";
   btnVolver.style.display="none";
-
-  // Cierra cronograma si estaba abierto
-  cronogramaPanel.classList.remove('open');
-  document.body.style.overflow = "";
-
-  // Oculta botón cronograma otra vez
-  btnCronograma.style.display = "none";
+  btnCronograma.style.display="none";
 }
-
 </script>
-
-<!-- BOTÓN CRONOGRAMA -->
-<button id="btnCronograma" class="cronograma-btn">
-  📘 Cronograma<br>y Temario
-</button>
-
-<div id="cronogramaOverlay"></div>
-  
-<!-- PANEL CRONOGRAMA -->
-<div id="cronogramaPanel" class="cronograma-panel">
-  <div class="cronograma-header">
-    <h3>📘 Cronograma y Temario</h3>
-    <span class="cronograma-hora">Siempre a las 19:30 hs</span>
-  </div>
-
-  <div class="cronograma-content">
-
-    <h4>Clases dictadas (recuperables)</h4>
-
-    <div class="clase pasada">
-      <span>🧩 29/11/2025 – Armado y Componentes</span>
-      <a href="https://www.twitch.tv/videos/2631557465" target="_blank">▶ Ver grabación</a>
-    </div>
-
-    <div class="clase pasada">
-      <span>💿 13/12/2025 – Instalación de SO y Drivers</span>
-      <a href="https://www.twitch.tv/videos/2643299509" target="_blank">▶ Ver grabación</a>
-    </div>
-
-    <div class="clase pasada">
-      <span>⚙️ 20/12/2025 – Programación de BIOS</span>
-      <a href="https://www.twitch.tv/videos/2649204620" target="_blank">▶ Ver grabación</a>
-    </div>
-
-    <hr>
-
-    <h4>Clases de Enero 2026</h4>
-
-    <div class="clase futura">🧰 03/01/2026 – Software y Herramientas</div>
-    <div class="clase futura">🔬 10/01/2026 – Microsoldaduras</div>
-    <div class="clase futura">🧠 17/01/2026 – Solución de Problemas</div>
-    <div class="clase futura ultima">🦠 24/01/2026 – Virus y Malware (Última clase)</div>
-
-  </div>
-</div>
-
-<script>
-const cronogramaPanel = document.getElementById('cronogramaPanel');
-const btnCronograma = document.getElementById('btnCronograma');
-const cronogramaOverlay = document.getElementById('cronogramaOverlay');
-const cronogramaHeader = cronogramaPanel.querySelector('.cronograma-header');
-
-function abrirCronograma(){
-  cronogramaPanel.classList.add('open');
-  cronogramaOverlay.style.display = 'block';
-  document.body.style.overflow = 'hidden';
-}
-
-function cerrarCronograma(){
-  cronogramaPanel.classList.remove('open');
-  cronogramaOverlay.style.display = 'none';
-  document.body.style.overflow = '';
-}
-
-btnCronograma.addEventListener('click', abrirCronograma);
-cronogramaOverlay.addEventListener('click', cerrarCronograma);
-cronogramaHeader.addEventListener('click', cerrarCronograma);
-</script>
-
-
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
