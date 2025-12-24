@@ -107,6 +107,7 @@ button{
 .estado-ok{color:var(--ok);font-weight:bold}
 .estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
+.estado-neutral{color:var(--neutral);font-weight:bold}
 
 /* GRAFICOS */
 .graficos{
@@ -115,7 +116,7 @@ button{
   gap:32px;
 }
 .graficos > div{
-  min-height:160px;
+  min-height:140px;
 }
 </style>
 </head>
@@ -200,18 +201,23 @@ const kEstado=document.getElementById("k-estado");
 const tablaClases=document.getElementById("tablaClases");
 const graficos=document.getElementById("graficos");
 
-/* CONFIG CLASES */
+/* CONFIG */
 const CFG={
-  "1er":{total:11400,min:8550},
-  "2da":{total:6800,min:5100},
-  "3er":{total:7600,min:5700}
+  "1er":{total:11400,min:8550,n:"Primer Clase"},
+  "2da":{total:6800,min:5100,n:"Segunda Clase"},
+  "3er":{total:7600,min:5700,n:"Tercer Clase"}
 };
-const FUTURAS = ["4ta","5ta","6ta","Ultima"];
+const FUTURAS=[
+  {k:"4ta",n:"Cuarta Clase"},
+  {k:"5ta",n:"Quinta Clase"},
+  {k:"6ta",n:"Sexta Clase"},
+  {k:"Ultima",n:"Última Clase"}
+];
 
 btnVer.onclick=cargar;
 
 function parseTiempo(t){
-  if(!t)return 0;
+  if(!t) return 0;
   const h=/(\d+)h/.exec(t);
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
@@ -219,7 +225,7 @@ function parseTiempo(t){
 }
 
 function barra(el,cfg,real,titulo){
-  const color=real>=cfg.min? "#3cff8f" : real>=cfg.min*0.85? "#ffd84c" : "#ff4c4c";
+  const color=real>=cfg.min?"#3cff8f":real>=cfg.min*0.85?"#ffd84c":"#ff4c4c";
   Plotly.newPlot(el,[{
     type:"bar",
     orientation:"h",
@@ -237,8 +243,31 @@ function barra(el,cfg,real,titulo){
       y0:-0.5,y1:0.5,
       line:{color:"#fff",dash:"dot"}
     }],
-    height:140,
+    height:120,
     margin:{l:30,r:20,t:40,b:20},
+    paper_bgcolor:"transparent",
+    plot_bgcolor:"transparent",
+    showlegend:false,
+    font:{color:"#fff"}
+  },{
+    displayModeBar:false,
+    responsive:true
+  });
+}
+
+function barraFutura(el,titulo){
+  Plotly.newPlot(el,[{
+    type:"bar",
+    orientation:"h",
+    x:[100],
+    y:[""],
+    marker:{color:"#7a82c8"}
+  }],{
+    title:{text:titulo+" (no dictada)",font:{size:14}},
+    xaxis:{range:[0,100],visible:false,fixedrange:true},
+    yaxis:{visible:false,fixedrange:true},
+    height:100,
+    margin:{l:20,r:20,t:40,b:20},
     paper_bgcolor:"transparent",
     plot_bgcolor:"transparent",
     showlegend:false,
@@ -253,7 +282,7 @@ function cargar(){
   fetch(API_URL+"?dni="+dniInput.value)
   .then(r=>r.json())
   .then(a=>{
-    if(a.error){ alert(a.error); return; }
+    if(a.error){alert(a.error);return;}
 
     login.style.display="none";
     contenido.style.display="block";
@@ -269,58 +298,38 @@ function cargar(){
     graficos.innerHTML="";
     let ok=0;
 
-    ["1er","2da","3er"].forEach(k=>{
+    Object.keys(CFG).forEach(k=>{
+      const cfg=CFG[k];
       const t=parseTiempo(a[k+"Clase – Tiempo"]);
-      const pct=Math.round(t/CFG[k].total*100);
-      const estado=t>=CFG[k].min?"PRESENTE":"REVISAR";
-      if(t>=CFG[k].min) ok++;
+      const pct=Math.round(t/cfg.total*100);
+      const estado=t>=cfg.min?"PRESENTE":"REVISAR";
+      if(t>=cfg.min) ok++;
 
-    FUTURAS.forEach(k=>{
-    tablaClases.innerHTML += `
-      <tr>
-        <td>${k}</td>
-        <td class="estado-neutral">PROXIMAMENTE</td>
-        <td>PROXIMAMENTE</td>
-        <td>-</td>
-      </tr>
-    `;
-
-    const d = document.createElement("div");
-    graficos.appendChild(d);
-
-    Plotly.newPlot(d,[{
-      type:"bar",
-      orientation:"h",
-      x:[100],
-      y:[""],
-      marker:{color:"#7a82c8"}
-    }],{
-      title:{text:k+" Clase (no dictada)",font:{size:14}},
-      xaxis:{range:[0,100],visible:false,fixedrange:true},
-      yaxis:{visible:false,fixedrange:true},
-      height:120,
-      margin:{l:20,r:20,t:40,b:20},
-      paper_bgcolor:"transparent",
-      plot_bgcolor:"transparent",
-      showlegend:false,
-      font:{color:"#fff"}
-    },{
-      displayModeBar:false,
-      responsive:true
-    });
-  });
-      
       tablaClases.innerHTML+=`
         <tr>
-          <td>${k}</td>
-          <td class="${t>=CFG[k].min?"estado-ok":"estado-warn"}">${estado}</td>
+          <td>${cfg.n}</td>
+          <td class="${t>=cfg.min?"estado-ok":"estado-warn"}">${estado}</td>
           <td>${a[k+"Clase – Tiempo"]||"-"}</td>
           <td>${pct}%</td>
         </tr>`;
 
       const d=document.createElement("div");
       graficos.appendChild(d);
-      barra(d,CFG[k],t,k+" Clase");
+      barra(d,cfg,t,cfg.n);
+    });
+
+    FUTURAS.forEach(f=>{
+      tablaClases.innerHTML+=`
+        <tr>
+          <td>${f.n}</td>
+          <td class="estado-neutral">PROXIMAMENTE</td>
+          <td>PROXIMAMENTE</td>
+          <td>-</td>
+        </tr>`;
+
+      const d=document.createElement("div");
+      graficos.appendChild(d);
+      barraFutura(d,f.n);
     });
 
     kAsistencia.innerText=ok+"/3";
@@ -338,4 +347,3 @@ function volver(){
 
 </body>
 </html>
-
