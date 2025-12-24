@@ -230,20 +230,22 @@ function cargar(){
 
     kAsistencia.innerText=`${pres}/${clases.length}`;
     kPorcentaje.innerText=`${Math.round(pres/clases.length*100)}%`;
-    kMail.innerText=a["Mail enviado"];
+    kMailKpi.innerText = a["Mail enviado"];
     kEstado.innerText=pres/clases.length>=0.75?"REGULAR":"EN RIESGO";
   });
 }
 
-const dCorreo=document.getElementById("d-correo");
-const dTelefono=document.getElementById("d-telefono");
-const dTwitch=document.getElementById("d-twitch");
-const dObs=document.getElementById("d-obs");
-const dMail=document.getElementById("d-mail");
-const kAsistencia=document.getElementById("k-asistencia");
-const kPorcentaje=document.getElementById("k-porcentaje");
-const kEstado=document.getElementById("k-estado");
-const kMail=document.getElementById("k-mail");
+const dCorreo   = document.getElementById("d-correo");
+const dTelefono = document.getElementById("d-telefono");
+const dTwitch   = document.getElementById("d-twitch");
+const dObs      = document.getElementById("d-obs");
+const dMail     = document.getElementById("d-mail");
+
+const kAsistencia = document.getElementById("k-asistencia");
+const kPorcentaje = document.getElementById("k-porcentaje");
+const kEstado     = document.getElementById("k-estado");
+const kMailKpi    = document.getElementById("k-mail");
+
 
 const dniURL=new URLSearchParams(location.search).get("dni");
 if(dniURL){dniInput.value=dniURL;cargar();}
@@ -251,3 +253,4 @@ if(dniURL){dniInput.value=dniURL;cargar();}
 
 </body>
 </html>
+
