@@ -357,14 +357,14 @@ const CFG={
   "3er":{total:7600,min:5700,n:"Tercer Clase"}
 };
 
-const ORDEN=[
-  {tipo:"real",k:"1er"},
-  {tipo:"real",k:"2da"},
-  {tipo:"real",k:"3er"},
-  {tipo:"futura",n:"Cuarta Clase"},
-  {tipo:"futura",n:"Quinta Clase"},
-  {tipo:"futura",n:"Sexta Clase"},
-  {tipo:"futura",n:"Última Clase"}
+const ORDEN = [
+  { n:"Primer Clase", k:"1er" },
+  { n:"Segunda Clase", k:"2da" },
+  { n:"Tercer Clase", k:"3er" },
+  { n:"Cuarta Clase", k:"4ta" },
+  { n:"Quinta Clase", k:"5ta" },
+  { n:"Sexta Clase", k:"6ta" },
+  { n:"Última Clase", k:"7ma" }
 ];
 
 btnVer.onclick=cargar;
@@ -453,43 +453,56 @@ function cargar(){
     let ok=0;
 
     ORDEN.forEach(item=>{
-      if(item.tipo==="real"){
-        const cfg=CFG[item.k];
-        const t=parseTiempo(a[item.k+"Clase – Tiempo"]);
-        const pct=Math.round(t/cfg.total*100);
-        const estado=t>=cfg.min?"PRESENTE":"REVISAR";
-        if(t>=cfg.min) ok++;
+    const estadoSheet = (a[item.k + "Clase – Situación"] || "").toUpperCase();
+    const tiempoSheet = a[item.k + "Clase – Tiempo"] || "-";
 
-        tablaClases.innerHTML+=`
-          <tr>
-            <td>${cfg.n}</td>
-            <td class="${t>=cfg.min?"estado-ok":"estado-warn"}">${estado}</td>
-            <td>${a[item.k+"Clase – Tiempo"]||"-"}</td>
-            <td>${pct}%</td>
-          </tr>`;
+    let claseEstado = "estado-neutral";
 
-        const d=document.createElement("div");
-        graficos.appendChild(d);
-        barra(d,cfg,t,cfg.n);
-      }else{
-        tablaClases.innerHTML+=`
-          <tr>
-            <td>${item.n}</td>
-            <td class="estado-neutral">PROXIMAMENTE</td>
-            <td>PROXIMAMENTE</td>
-            <td>-</td>
-          </tr>`;
+    if (estadoSheet === "PRESENTE") claseEstado = "estado-ok";
+    else if (estadoSheet === "RECUPERADA") claseEstado = "estado-neutral";
+    else if (estadoSheet === "AUSENTE") claseEstado = "estado-bad";
+    else if (estadoSheet === "REVISAR") claseEstado = "estado-warn";
 
-        const d=document.createElement("div");
-        graficos.appendChild(d);
-        barraFutura(d,item.n);
-      }
-    });
-
-    kAsistencia.innerText=ok+"/3";
-    kPorcentaje.innerText=Math.round(ok/3*100)+"%";
-    kEstado.innerText=ok/3>=0.75?"REGULAR":"EN RIESGO";
+    tablaClases.innerHTML += `
+      <tr>
+        <td>${item.n}</td>
+        <td class="${claseEstado}">${estadoSheet || "-"}</td>
+        <td>${tiempoSheet}</td>
+        <td>-</td>
+      </tr>
+    `;
   });
+
+  // KPI basado SOLO en la situación del Sheet
+  const estadosValidos = ["PRESENTE", "RECUPERADA"];
+
+  let totalValidas = 0;
+
+  // evaluamos solo las primeras 3 clases
+  ["1er","2da","3er"].forEach(k => {
+    const est = (a[k + "Clase – Situación"] || "").toUpperCase();
+    if (estadosValidos.includes(est)) totalValidas++;
+  });
+
+  // Asistencia
+  kAsistencia.innerText = totalValidas + "/3";
+
+  // Porcentaje
+  kPorcentaje.innerText = Math.round((totalValidas / 3) * 100) + "%";
+
+  // Estado general
+  if (totalValidas === 0) {
+    kEstado.innerText = "RIESGO DE BAJA";
+    kEstado.className = "estado-bad";
+  } else if (totalValidas === 3) {
+    kEstado.innerText = "EXCELENTE";
+    kEstado.className = "estado-ok";
+  } else {
+    kEstado.innerText = "DEBE CLASES";
+    kEstado.className = "estado-warn";
+  }
+
+
 }
 
 function volver(){
@@ -579,6 +592,7 @@ cronogramaHeader.addEventListener('click', cerrarCronograma);
 
 </body>
 </html>
+
 
 
 
