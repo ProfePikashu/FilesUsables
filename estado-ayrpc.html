@@ -453,7 +453,7 @@ function cargar(){
     let ok=0;
 
     ORDEN.forEach(item=>{
-    const estadoSheet = (a[item.k + "Clase – Situación"] || "").toUpperCase();
+    const estadoSheet = (a[item.k + "Clase – Presente"] || "").toUpperCase();
     const tiempoSheet = a[item.k + "Clase – Tiempo"] || "-";
 
     let claseEstado = "estado-neutral";
@@ -480,7 +480,7 @@ function cargar(){
 
   // evaluamos solo las primeras 3 clases
   ["1er","2da","3er"].forEach(k => {
-    const est = (a[k + "Clase – Situación"] || "").toUpperCase();
+    const est = (a[k + "Clase – Presente"] || "").toUpperCase();
     if (estadosValidos.includes(est)) totalValidas++;
   });
 
@@ -592,6 +592,7 @@ cronogramaHeader.addEventListener('click', cerrarCronograma);
 
 </body>
 </html>
+
 
 
 
