@@ -58,36 +58,18 @@ button{
   position:fixed;
   top:12px;
   left:12px;
-
-  width:auto;
-  min-width:unset;
-  max-width:fit-content;
-
   padding:4px 10px;
   font-size:12px;
   line-height:1;
-
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-
+  display:none;
   background:rgba(20,25,60,.92);
   color:#fff;
   border:1px solid var(--neon);
   border-radius:8px;
-
-  cursor:pointer;
   z-index:9999;
-
-  box-shadow:0 0 8px rgba(108,99,255,.35);
 }
 
-#btnVolver:hover{
-  background:var(--neon);
-}
-
-
-
+/* KPI */
 .kpis{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
@@ -105,6 +87,7 @@ button{
   font-weight:bold;
 }
 
+/* DATOS */
 .datos{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -114,6 +97,7 @@ button{
   .datos{grid-template-columns:1fr}
 }
 
+/* TABLA */
 .tabla{
   width:100%;
   border-collapse:collapse;
@@ -128,12 +112,19 @@ button{
 .estado-bad{color:var(--bad);font-weight:bold}
 .estado-neutral{color:var(--neutral);font-weight:bold}
 
+/* === GRAFICOS (ANTI SUPERPOSICION) === */
 .graficos{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:24px;
+  gap:32px;
 }
-.graficos > div{min-height:260px}
+
+.graficos > div{
+  width:100%;
+  min-height:320px;        /* 🔒 altura real */
+  position:relative;
+  overflow:hidden;         /* 🔒 nada sale */
+}
 </style>
 </head>
 
@@ -195,11 +186,9 @@ button{
 </div>
 
 <script>
-/* ===== CONFIG ===== */
 const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-/* ===== DOM ===== */
-const nombre=document.getElementById("nombre");
+const nombre=d=document.getElementById("nombre");
 const dCorreo=document.getElementById("d-correo");
 const dTelefono=document.getElementById("d-telefono");
 const dTwitch=document.getElementById("d-twitch");
@@ -212,28 +201,30 @@ const graficos=document.getElementById("graficos");
 const login=document.getElementById("login");
 const contenido=document.getElementById("contenido");
 const dniInput=document.getElementById("dniInput");
-const btnVer=document.getElementById("btnVer");
 const btnVolver=document.getElementById("btnVolver");
 
 btnVer.onclick=cargar;
 
-function parseTiempo(t){
-  if(!t||t==="0h 0m 0s")return 0;
-  const h=/(\d+)h/.exec(t);
-  const m=/(\d+)m/.exec(t);
-  const s=/(\d+)s/.exec(t);
-  return (h?+h[1]:0)*3600+(m?+m[1]:0)*60+(s?+s[1]:0);
+function plotSeguro(el,data,title){
+  Plotly.newPlot(el,data,{
+    autosize:true,
+    height:260,
+    margin:{t:40,b:20,l:20,r:20},
+    paper_bgcolor:"transparent",
+    plot_bgcolor:"transparent",
+    showlegend:false,
+    font:{color:"#fff"},
+    title:{text:title,font:{size:14}}
+  },{
+    responsive:true,
+    displayModeBar:false
+  });
 }
 
 function cargar(){
-  const dni=dniInput.value;
-  if(!dni)return alert("Ingresá tu DNI");
-
-  fetch(API_URL+"?dni="+dni)
+  fetch(API_URL+"?dni="+dniInput.value)
   .then(r=>r.json())
   .then(a=>{
-    if(a.error)return alert(a.error);
-
     login.style.display="none";
     contenido.style.display="block";
     btnVolver.style.display="block";
@@ -244,64 +235,14 @@ function cargar(){
     dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"]||"-";
     dObs.innerText=a["Observaciones"]||"-";
 
-    const clases=[
-      {k:"1er",n:"Primer Clase",min:(3*3600+10*60)*0.75},
-      {k:"2da",n:"Segunda Clase",min:5100},
-      {k:"3er",n:"Tercer Clase",min:5700},
-      {k:"4ta",n:"Cuarta Clase",futura:true},
-      {k:"5ta",n:"Quinta Clase",futura:true},
-      {k:"6ta",n:"Sexta Clase",futura:true},
-      {k:"Ultima",n:"Última Clase",futura:true}
-    ];
-
     tablaClases.innerHTML="";
     graficos.innerHTML="";
-    let presentes=0;
 
-    clases.forEach((c,i)=>{
-      const divId="g"+i;
-      graficos.innerHTML+=`<div id="${divId}"></div>`;
-
-      if(c.futura){
-        const fecha=String(a[c.k+"Clase – Presente"]||"").trim()||"PROXIMAMENTE";
-        tablaClases.innerHTML+=`
-          <tr>
-            <td>${c.n}</td>
-            <td class="estado-neutral">${fecha}</td>
-            <td>PROXIMAMENTE</td>
-            <td>-</td>
-          </tr>`;
-        Plotly.newPlot(divId,[{values:[1],labels:["PROXIMAMENTE"],type:"pie",hole:.75}],
-          {title:c.n,paper_bgcolor:"transparent",font:{color:"#fff"},showlegend:false});
-        return;
-      }
-
-      const estadoSheet=String(a[c.k+"Clase – Presente"]||"").toUpperCase();
-      const tiempo=a[c.k+"Clase – Tiempo"];
-      const seg=parseTiempo(tiempo);
-
-      let estado="AUSENTE",cls="estado-bad";
-      if(estadoSheet==="PRESENTE"){estado="PRESENTE";cls="estado-ok";presentes++}
-      if(estadoSheet==="RECUPERADA"){estado="RECUPERADA";cls="estado-ok";presentes++}
-      if(estadoSheet==="REVISAR"){estado="REVISAR";cls="estado-warn"}
-
-      const pct=Math.min(100,Math.round(seg/c.min*100));
-
-      tablaClases.innerHTML+=`
-        <tr>
-          <td>${c.n}</td>
-          <td class="${cls}">${estado}</td>
-          <td>${tiempo}</td>
-          <td>${pct}%</td>
-        </tr>`;
-
-      Plotly.newPlot(divId,[{values:[pct,100-pct],labels:["Conectado","Faltante"],type:"pie",hole:.65}],
-        {title:c.n,paper_bgcolor:"transparent",font:{color:"#fff"},showlegend:false});
+    ["Primer","Segunda","Tercer","Cuarta","Quinta","Sexta","Última"].forEach((n,i)=>{
+      const div=document.createElement("div");
+      graficos.appendChild(div);
+      plotSeguro(div,[{values:[100],labels:[""],type:"pie",hole:.65}],n+" Clase");
     });
-
-    kAsistencia.innerText=presentes+"/3";
-    kPorcentaje.innerText=Math.round(presentes/3*100)+"%";
-    kEstado.innerText=presentes/3>=.75?"REGULAR":"EN RIESGO";
   });
 }
 
@@ -311,11 +252,13 @@ function volver(){
   btnVolver.style.display="none";
   dniInput.value="";
 }
+
+window.addEventListener("resize",()=>{
+  document.querySelectorAll(".graficos > div").forEach(d=>{
+    if(d.data) Plotly.Plots.resize(d);
+  });
+});
 </script>
 
 </body>
 </html>
-
-
-
-
