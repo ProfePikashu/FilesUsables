@@ -188,16 +188,31 @@ button{
   opacity: 0.9;
 }
 
-.cronograma-close {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
+.cronograma-close{
+  position:absolute;
+  top:12px;
+  right:12px;
+
+  width:32px;
+  height:32px;
+  line-height:32px;
+
+  background:rgba(0,0,0,.25);
+  border:none;
+  border-radius:50%;
+
+  color:#fff;
+  font-size:18px;
+  font-weight:bold;
+
+  cursor:pointer;
+  text-align:center;
 }
+  
+.cronograma-close:hover{
+  background:rgba(0,0,0,.45);
+}
+
 
 .cronograma-content {
   padding: 16px;
@@ -543,6 +558,7 @@ function toggleCronograma() {
 
 </body>
 </html>
+
 
 
 
