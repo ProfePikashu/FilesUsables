@@ -50,15 +50,12 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-button.secondary{
-  background:#2b2f6a;
-}
 
 /* BOTON VOLVER */
 #btnVolver{
   position:fixed;
-  top:14px;
-  left:14px;
+  top:12px;
+  left:12px;
   padding:6px 12px;
   font-size:13px;
   border-radius:8px;
@@ -181,27 +178,26 @@ button.secondary{
 const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
 /* ===== DOM ===== */
-const nombre = document.getElementById("nombre");
-const dCorreo = document.getElementById("d-correo");
-const dTelefono = document.getElementById("d-telefono");
-const dTwitch = document.getElementById("d-twitch");
-const dObs = document.getElementById("d-obs");
-const kAsistencia = document.getElementById("k-asistencia");
-const kPorcentaje = document.getElementById("k-porcentaje");
-const kEstado = document.getElementById("k-estado");
-const tablaClases = document.getElementById("tablaClases");
-const graficos = document.getElementById("graficos");
-const login = document.getElementById("login");
-const contenido = document.getElementById("contenido");
-const dniInput = document.getElementById("dniInput");
-const btnVer = document.getElementById("btnVer");
-const btnVolver = document.getElementById("btnVolver");
+const nombre=document.getElementById("nombre");
+const dCorreo=document.getElementById("d-correo");
+const dTelefono=document.getElementById("d-telefono");
+const dTwitch=document.getElementById("d-twitch");
+const dObs=document.getElementById("d-obs");
+const kAsistencia=document.getElementById("k-asistencia");
+const kPorcentaje=document.getElementById("k-porcentaje");
+const kEstado=document.getElementById("k-estado");
+const tablaClases=document.getElementById("tablaClases");
+const graficos=document.getElementById("graficos");
+const login=document.getElementById("login");
+const contenido=document.getElementById("contenido");
+const dniInput=document.getElementById("dniInput");
+const btnVer=document.getElementById("btnVer");
+const btnVolver=document.getElementById("btnVolver");
 
-/* ===== LOGICA ===== */
-btnVer.onclick = cargar;
+btnVer.onclick=cargar;
 
 function parseTiempo(t){
-  if(!t || t==="0h 0m 0s") return 0;
+  if(!t||t==="0h 0m 0s")return 0;
   const h=/(\d+)h/.exec(t);
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
@@ -210,12 +206,12 @@ function parseTiempo(t){
 
 function cargar(){
   const dni=dniInput.value;
-  if(!dni) return alert("Ingresá tu DNI");
+  if(!dni)return alert("Ingresá tu DNI");
 
   fetch(API_URL+"?dni="+dni)
   .then(r=>r.json())
   .then(a=>{
-    if(a.error) return alert(a.error);
+    if(a.error)return alert(a.error);
 
     login.style.display="none";
     contenido.style.display="block";
