@@ -137,7 +137,106 @@ button{
 .graficos > div{
   min-height:140px;
 }
+
+.cronograma-btn {
+  position: fixed;
+  right: 0;
+  top: 40%;
+  z-index: 1000;
+  background: #6a00ff;
+  color: #fff;
+  border: none;
+  padding: 12px 10px;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 8px 0 0 8px;
+  box-shadow: 0 0 15px rgba(106,0,255,.6);
+}
+
+.cronograma-panel {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 420px;
+  height: 100%;
+  background: #0e0e16;
+  color: #fff;
+  z-index: 1001;
+  transition: right 0.35s ease;
+  box-shadow: -10px 0 30px rgba(0,0,0,.6);
+  display: flex;
+  flex-direction: column;
+}
+
+.cronograma-panel.open {
+  right: 0;
+}
+
+.cronograma-header {
+  padding: 16px;
+  background: linear-gradient(90deg,#6a00ff,#9b5cff);
+  position: relative;
+}
+
+.cronograma-header h3 {
+  margin: 0;
+}
+
+.cronograma-hora {
+  font-size: 0.85em;
+  opacity: 0.9;
+}
+
+.cronograma-close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.cronograma-content {
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.cronograma-content h4 {
+  margin-top: 0;
+  color: #b98cff;
+}
+
+.clase {
+  background: #161626;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.clase a {
+  background: #00d084;
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.clase.futura {
+  opacity: 0.75;
+}
+
+.clase.ultima {
+  border: 1px solid #ff4d4d;
+}
 </style>
+  
 </head>
 
 <body>
@@ -368,6 +467,62 @@ function volver(){
 }
 </script>
 
+<!-- BOTÓN CRONOGRAMA -->
+<button id="btnCronograma" class="cronograma-btn">
+  📘 Cronograma<br>y Temario
+</button>
+
+<!-- PANEL CRONOGRAMA -->
+<div id="cronogramaPanel" class="cronograma-panel">
+  <div class="cronograma-header">
+    <h3>📘 Cronograma y Temario</h3>
+    <span class="cronograma-hora">Siempre a las 19:30 hs</span>
+    <button class="cronograma-close" onclick="toggleCronograma()">✕</button>
+  </div>
+
+  <div class="cronograma-content">
+
+    <h4>Clases dictadas (recuperables)</h4>
+
+    <div class="clase pasada">
+      <span>🧩 29/11/2025 – Armado y Componentes</span>
+      <a href="LINK_GRABACION_1" target="_blank">▶ Ver grabación</a>
+    </div>
+
+    <div class="clase pasada">
+      <span>💿 13/12/2025 – Instalación de SO y Drivers</span>
+      <a href="LINK_GRABACION_2" target="_blank">▶ Ver grabación</a>
+    </div>
+
+    <div class="clase pasada">
+      <span>⚙️ 20/12/2025 – Programación de BIOS</span>
+      <a href="LINK_GRABACION_3" target="_blank">▶ Ver grabación</a>
+    </div>
+
+    <hr>
+
+    <h4>Clases de Enero 2026</h4>
+
+    <div class="clase futura">🧰 03/01/2026 – Software y Herramientas</div>
+    <div class="clase futura">🔬 10/01/2026 – Microsoldaduras</div>
+    <div class="clase futura">🧠 17/01/2026 – Solución de Problemas</div>
+    <div class="clase futura ultima">🦠 24/01/2026 – Virus y Malware (Última clase)</div>
+
+  </div>
+</div>
+
+  <script>
+  const panel = document.getElementById('cronogramaPanel');
+  const btn = document.getElementById('btnCronograma');
+
+  function toggleCronograma() {
+    panel.classList.toggle('open');
+  }
+
+  btn.addEventListener('click', toggleCronograma);
+</script>
+
 </body>
 </html>
+
 
