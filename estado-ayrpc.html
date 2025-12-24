@@ -447,31 +447,38 @@ function cargar(){
     dTelefono.innerText=a["Teléfono (con Código de Área)"]||"-";
     dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"]||"-";
     dObs.innerText=a["Observaciones"]||"-";
+    
+    tablaClases.innerHTML = "";
+    graficos.innerHTML = "";
 
-    tablaClases.innerHTML="";
-    graficos.innerHTML="";
-    let ok=0;
+    let totalValidas = 0;
 
-    ORDEN.forEach(item=>{
-    const estadoSheet = (a[item.k + "Clase – Presente"] || "").toUpperCase();
-    const tiempoSheet = a[item.k + "Clase – Tiempo"] || "-";
+ORDEN.forEach((item, index) => {
+  const estadoRaw = (a[item.k + "Clase – Presente"] || "").toUpperCase();
+  const tiempo = a[item.k + "Clase – Tiempo"] || "-";
 
-    let claseEstado = "estado-neutral";
+  let claseCss = "estado-neutral";
 
-    if (estadoSheet === "PRESENTE") claseEstado = "estado-ok";
-    else if (estadoSheet === "RECUPERADA") claseEstado = "estado-neutral";
-    else if (estadoSheet === "AUSENTE") claseEstado = "estado-bad";
-    else if (estadoSheet === "REVISAR") claseEstado = "estado-warn";
+  if (estadoRaw === "PRESENTE") claseCss = "estado-ok";
+  else if (estadoRaw === "RECUPERADA") claseCss = "estado-ok";
+  else if (estadoRaw === "AUSENTE") claseCss = "estado-bad";
+  else if (estadoRaw === "REVISAR") claseCss = "estado-warn";
 
-    tablaClases.innerHTML += `
-      <tr>
-        <td>${item.n}</td>
-        <td class="${claseEstado}">${estadoSheet || "-"}</td>
-        <td>${tiempoSheet}</td>
-        <td>-</td>
-      </tr>
-    `;
-  });
+  tablaClases.innerHTML += `
+    <tr>
+      <td>${item.n}</td>
+      <td class="${claseCss}">${estadoRaw || "-"}</td>
+      <td>${tiempo}</td>
+      <td>-</td>
+    </tr>
+  `;
+
+  // 👉 solo contamos las primeras 3
+  if (index < 3 && (estadoRaw === "PRESENTE" || estadoRaw === "RECUPERADA")) {
+    totalValidas++;
+  }
+});
+
 
   // KPI basado SOLO en la situación del Sheet
   const estadosValidos = ["PRESENTE", "RECUPERADA"];
@@ -485,22 +492,20 @@ function cargar(){
   });
 
   // Asistencia
-  kAsistencia.innerText = totalValidas + "/3";
+ kAsistencia.innerText = totalValidas + "/3";
+kPorcentaje.innerText = Math.round((totalValidas / 3) * 100) + "%";
 
-  // Porcentaje
-  kPorcentaje.innerText = Math.round((totalValidas / 3) * 100) + "%";
+if (totalValidas === 0) {
+  kEstado.innerText = "RIESGO DE BAJA";
+  kEstado.className = "estado-bad";
+} else if (totalValidas === 3) {
+  kEstado.innerText = "EXCELENTE";
+  kEstado.className = "estado-ok";
+} else {
+  kEstado.innerText = "DEBE CLASES";
+  kEstado.className = "estado-warn";
+}
 
-  // Estado general
-  if (totalValidas === 0) {
-    kEstado.innerText = "RIESGO DE BAJA";
-    kEstado.className = "estado-bad";
-  } else if (totalValidas === 3) {
-    kEstado.innerText = "EXCELENTE";
-    kEstado.className = "estado-ok";
-  } else {
-    kEstado.innerText = "DEBE CLASES";
-    kEstado.className = "estado-warn";
-  }
 
 }); // ← cierra el .then(a=>{ ... })
 
@@ -593,6 +598,7 @@ cronogramaHeader.addEventListener('click', cerrarCronograma);
 
 </body>
 </html>
+
 
 
 
