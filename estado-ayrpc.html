@@ -37,15 +37,13 @@ body{
 }
 h1,h2,h3{margin:0 0 10px}
 
-input,
-.card button{
+input,button{
   width:100%;
   padding:12px;
   border-radius:10px;
   border:none;
   font-size:16px;
 }
-
 button{
   background:var(--neon);
   color:#fff;
@@ -109,7 +107,6 @@ button{
 .estado-ok{color:var(--ok);font-weight:bold}
 .estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
-.estado-neutral{color:var(--neutral);font-weight:bold}
 
 /* GRAFICOS */
 .graficos{
@@ -181,31 +178,34 @@ button{
 </div>
 
 <script>
-/* ===== CONFIG ===== */
 const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-const CFG={
-  "1er":{nombre:"Primer Clase", total:11400, min:8550},
-  "2da":{nombre:"Segunda Clase", total:6800,  min:5100},
-  "3er":{nombre:"Tercer Clase",  total:7600,  min:5700}
-};
-
-/* ===== DOM ===== */
+/* DOM */
 const btnVer=document.getElementById("btnVer");
+const btnVolver=document.getElementById("btnVolver");
 const dniInput=document.getElementById("dniInput");
 const login=document.getElementById("login");
 const contenido=document.getElementById("contenido");
+
 const nombre=document.getElementById("nombre");
 const dCorreo=document.getElementById("d-correo");
 const dTelefono=document.getElementById("d-telefono");
 const dTwitch=document.getElementById("d-twitch");
 const dObs=document.getElementById("d-obs");
-const tablaClases=document.getElementById("tablaClases");
-const graficos=document.getElementById("graficos");
+
 const kAsistencia=document.getElementById("k-asistencia");
 const kPorcentaje=document.getElementById("k-porcentaje");
 const kEstado=document.getElementById("k-estado");
-const btnVolver=document.getElementById("btnVolver");
+
+const tablaClases=document.getElementById("tablaClases");
+const graficos=document.getElementById("graficos");
+
+/* CONFIG CLASES */
+const CFG={
+  "1er":{total:11400,min:8550},
+  "2da":{total:6800,min:5100},
+  "3er":{total:7600,min:5700}
+};
 
 btnVer.onclick=cargar;
 
@@ -218,7 +218,7 @@ function parseTiempo(t){
 }
 
 function barra(el,cfg,real,titulo){
-  const color = real>=cfg.min ? "#3cff8f" : real>=cfg.min*0.85 ? "#ffd84c" : "#ff4c4c";
+  const color=real>=cfg.min? "#3cff8f" : real>=cfg.min*0.85? "#ffd84c" : "#ff4c4c";
   Plotly.newPlot(el,[{
     type:"bar",
     orientation:"h",
@@ -233,8 +233,7 @@ function barra(el,cfg,real,titulo){
       type:"line",
       x0:Math.round(cfg.min/60),
       x1:Math.round(cfg.min/60),
-      y0:-0.5,
-      y1:0.5,
+      y0:-0.5,y1:0.5,
       line:{color:"#fff",dash:"dot"}
     }],
     height:140,
@@ -253,6 +252,8 @@ function cargar(){
   fetch(API_URL+"?dni="+dniInput.value)
   .then(r=>r.json())
   .then(a=>{
+    if(a.error){ alert(a.error); return; }
+
     login.style.display="none";
     contenido.style.display="block";
     btnVolver.style.display="block";
@@ -267,24 +268,23 @@ function cargar(){
     graficos.innerHTML="";
     let ok=0;
 
-    Object.keys(CFG).forEach(k=>{
-      const cfg=CFG[k];
+    ["1er","2da","3er"].forEach(k=>{
       const t=parseTiempo(a[k+"Clase – Tiempo"]);
-      const pct=Math.round(t/cfg.total*100);
-      const estado=t>=cfg.min?"PRESENTE":"REVISAR";
-      if(t>=cfg.min) ok++;
+      const pct=Math.round(t/CFG[k].total*100);
+      const estado=t>=CFG[k].min?"PRESENTE":"REVISAR";
+      if(t>=CFG[k].min) ok++;
 
       tablaClases.innerHTML+=`
         <tr>
-          <td>${cfg.nombre}</td>
-          <td class="${t>=cfg.min?"estado-ok":"estado-warn"}">${estado}</td>
-          <td>${a[k+"Clase – Tiempo"]||"0h 0m 0s"}</td>
+          <td>${k}</td>
+          <td class="${t>=CFG[k].min?"estado-ok":"estado-warn"}">${estado}</td>
+          <td>${a[k+"Clase – Tiempo"]||"-"}</td>
           <td>${pct}%</td>
         </tr>`;
 
       const d=document.createElement("div");
       graficos.appendChild(d);
-      barra(d,cfg,t,cfg.nombre);
+      barra(d,CFG[k],t,k+" Clase");
     });
 
     kAsistencia.innerText=ok+"/3";
@@ -297,7 +297,6 @@ function volver(){
   contenido.style.display="none";
   login.style.display="block";
   btnVolver.style.display="none";
-  dniInput.value="";
 }
 </script>
 
