@@ -206,6 +206,7 @@ const CFG={
   "2da":{total:6800,min:5100},
   "3er":{total:7600,min:5700}
 };
+const FUTURAS = ["4ta","5ta","6ta","Ultima"];
 
 btnVer.onclick=cargar;
 
@@ -274,6 +275,41 @@ function cargar(){
       const estado=t>=CFG[k].min?"PRESENTE":"REVISAR";
       if(t>=CFG[k].min) ok++;
 
+    FUTURAS.forEach(k=>{
+    tablaClases.innerHTML += `
+      <tr>
+        <td>${k}</td>
+        <td class="estado-neutral">PROXIMAMENTE</td>
+        <td>PROXIMAMENTE</td>
+        <td>-</td>
+      </tr>
+    `;
+
+    const d = document.createElement("div");
+    graficos.appendChild(d);
+
+    Plotly.newPlot(d,[{
+      type:"bar",
+      orientation:"h",
+      x:[100],
+      y:[""],
+      marker:{color:"#7a82c8"}
+    }],{
+      title:{text:k+" Clase (no dictada)",font:{size:14}},
+      xaxis:{range:[0,100],visible:false,fixedrange:true},
+      yaxis:{visible:false,fixedrange:true},
+      height:120,
+      margin:{l:20,r:20,t:40,b:20},
+      paper_bgcolor:"transparent",
+      plot_bgcolor:"transparent",
+      showlegend:false,
+      font:{color:"#fff"}
+    },{
+      displayModeBar:false,
+      responsive:true
+    });
+  });
+      
       tablaClases.innerHTML+=`
         <tr>
           <td>${k}</td>
@@ -302,3 +338,4 @@ function volver(){
 
 </body>
 </html>
+
