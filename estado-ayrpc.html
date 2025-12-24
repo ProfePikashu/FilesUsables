@@ -69,7 +69,6 @@ button.secondary{
   display:none;
   z-index:999;
 }
-#btnVolver:hover{background:var(--neon)}
 
 .kpis{
   display:grid;
@@ -111,16 +110,12 @@ button.secondary{
 .estado-bad{color:var(--bad);font-weight:bold}
 .estado-neutral{color:var(--neutral);font-weight:bold}
 
-/* GRAFICOS */
 .graficos{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
   gap:24px;
-  align-items:center;
 }
-.graficos > div{
-  min-height:260px;
-}
+.graficos > div{min-height:260px}
 </style>
 </head>
 
@@ -129,7 +124,6 @@ button.secondary{
 <button id="btnVolver" onclick="volver()">⬅ VOLVER</button>
 
 <div class="container">
-
 <h1>⚡ AyRPC – Estado Académico</h1>
 
 <div class="card" id="login">
@@ -183,12 +177,31 @@ button.secondary{
 </div>
 
 <script>
+/* ===== CONFIG ===== */
 const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-btnVer.onclick=cargar;
+/* ===== DOM ===== */
+const nombre = document.getElementById("nombre");
+const dCorreo = document.getElementById("d-correo");
+const dTelefono = document.getElementById("d-telefono");
+const dTwitch = document.getElementById("d-twitch");
+const dObs = document.getElementById("d-obs");
+const kAsistencia = document.getElementById("k-asistencia");
+const kPorcentaje = document.getElementById("k-porcentaje");
+const kEstado = document.getElementById("k-estado");
+const tablaClases = document.getElementById("tablaClases");
+const graficos = document.getElementById("graficos");
+const login = document.getElementById("login");
+const contenido = document.getElementById("contenido");
+const dniInput = document.getElementById("dniInput");
+const btnVer = document.getElementById("btnVer");
+const btnVolver = document.getElementById("btnVolver");
+
+/* ===== LOGICA ===== */
+btnVer.onclick = cargar;
 
 function parseTiempo(t){
-  if(!t||t==="0h 0m 0s")return 0;
+  if(!t || t==="0h 0m 0s") return 0;
   const h=/(\d+)h/.exec(t);
   const m=/(\d+)m/.exec(t);
   const s=/(\d+)s/.exec(t);
@@ -197,12 +210,12 @@ function parseTiempo(t){
 
 function cargar(){
   const dni=dniInput.value;
-  if(!dni)return alert("Ingresá tu DNI");
+  if(!dni) return alert("Ingresá tu DNI");
 
   fetch(API_URL+"?dni="+dni)
   .then(r=>r.json())
   .then(a=>{
-    if(a.error)return alert(a.error);
+    if(a.error) return alert(a.error);
 
     login.style.display="none";
     contenido.style.display="block";
@@ -240,24 +253,9 @@ function cargar(){
             <td class="estado-neutral">${fecha}</td>
             <td>PROXIMAMENTE</td>
             <td>-</td>
-          </tr>
-        `;
-
-        Plotly.newPlot(divId,[{
-          values:[1],
-          labels:["PROXIMAMENTE"],
-          marker:{colors:["#7a82c8"]},
-          type:"pie",
-          hole:.75,
-          textinfo:"label",
-          textfont:{size:12}
-        }],{
-          title:{text:c.n,y:0.95,font:{size:14}},
-          margin:{t:40,b:20,l:20,r:20},
-          paper_bgcolor:"transparent",
-          font:{color:"#fff"},
-          showlegend:false
-        },{responsive:true});
+          </tr>`;
+        Plotly.newPlot(divId,[{values:[1],labels:["PROXIMAMENTE"],type:"pie",hole:.75}],
+          {title:c.n,paper_bgcolor:"transparent",font:{color:"#fff"},showlegend:false});
         return;
       }
 
@@ -278,22 +276,10 @@ function cargar(){
           <td class="${cls}">${estado}</td>
           <td>${tiempo}</td>
           <td>${pct}%</td>
-        </tr>
-      `;
+        </tr>`;
 
-      Plotly.newPlot(divId,[{
-        values:[pct,100-pct],
-        labels:["Conectado","Faltante"],
-        type:"pie",
-        hole:.65,
-        textinfo:"none"
-      }],{
-        title:{text:c.n,y:0.95,font:{size:14}},
-        margin:{t:40,b:20,l:20,r:20},
-        paper_bgcolor:"transparent",
-        font:{color:"#fff"},
-        showlegend:false
-      },{responsive:true});
+      Plotly.newPlot(divId,[{values:[pct,100-pct],labels:["Conectado","Faltante"],type:"pie",hole:.65}],
+        {title:c.n,paper_bgcolor:"transparent",font:{color:"#fff"},showlegend:false});
     });
 
     kAsistencia.innerText=presentes+"/3";
@@ -307,14 +293,8 @@ function volver(){
   login.style.display="block";
   btnVolver.style.display="none";
   dniInput.value="";
-  history.replaceState(null,"",location.pathname);
 }
-
-const dniURL=new URLSearchParams(location.search).get("dni");
-if(dniURL){dniInput.value=dniURL;cargar();}
 </script>
 
 </body>
 </html>
-
-
