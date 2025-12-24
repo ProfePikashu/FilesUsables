@@ -207,11 +207,15 @@ const CFG={
   "2da":{total:6800,min:5100,n:"Segunda Clase"},
   "3er":{total:7600,min:5700,n:"Tercer Clase"}
 };
-const FUTURAS=[
-  {k:"4ta",n:"Cuarta Clase"},
-  {k:"5ta",n:"Quinta Clase"},
-  {k:"6ta",n:"Sexta Clase"},
-  {k:"Ultima",n:"Última Clase"}
+
+const ORDEN=[
+  {tipo:"real",k:"1er"},
+  {tipo:"real",k:"2da"},
+  {tipo:"real",k:"3er"},
+  {tipo:"futura",n:"Cuarta Clase"},
+  {tipo:"futura",n:"Quinta Clase"},
+  {tipo:"futura",n:"Sexta Clase"},
+  {tipo:"futura",n:"Última Clase"}
 ];
 
 btnVer.onclick=cargar;
@@ -298,38 +302,38 @@ function cargar(){
     graficos.innerHTML="";
     let ok=0;
 
-    Object.keys(CFG).forEach(k=>{
-      const cfg=CFG[k];
-      const t=parseTiempo(a[k+"Clase – Tiempo"]);
-      const pct=Math.round(t/cfg.total*100);
-      const estado=t>=cfg.min?"PRESENTE":"REVISAR";
-      if(t>=cfg.min) ok++;
+    ORDEN.forEach(item=>{
+      if(item.tipo==="real"){
+        const cfg=CFG[item.k];
+        const t=parseTiempo(a[item.k+"Clase – Tiempo"]);
+        const pct=Math.round(t/cfg.total*100);
+        const estado=t>=cfg.min?"PRESENTE":"REVISAR";
+        if(t>=cfg.min) ok++;
 
-      tablaClases.innerHTML+=`
-        <tr>
-          <td>${cfg.n}</td>
-          <td class="${t>=cfg.min?"estado-ok":"estado-warn"}">${estado}</td>
-          <td>${a[k+"Clase – Tiempo"]||"-"}</td>
-          <td>${pct}%</td>
-        </tr>`;
+        tablaClases.innerHTML+=`
+          <tr>
+            <td>${cfg.n}</td>
+            <td class="${t>=cfg.min?"estado-ok":"estado-warn"}">${estado}</td>
+            <td>${a[item.k+"Clase – Tiempo"]||"-"}</td>
+            <td>${pct}%</td>
+          </tr>`;
 
-      const d=document.createElement("div");
-      graficos.appendChild(d);
-      barra(d,cfg,t,cfg.n);
-    });
+        const d=document.createElement("div");
+        graficos.appendChild(d);
+        barra(d,cfg,t,cfg.n);
+      }else{
+        tablaClases.innerHTML+=`
+          <tr>
+            <td>${item.n}</td>
+            <td class="estado-neutral">PROXIMAMENTE</td>
+            <td>PROXIMAMENTE</td>
+            <td>-</td>
+          </tr>`;
 
-    FUTURAS.forEach(f=>{
-      tablaClases.innerHTML+=`
-        <tr>
-          <td>${f.n}</td>
-          <td class="estado-neutral">PROXIMAMENTE</td>
-          <td>PROXIMAMENTE</td>
-          <td>-</td>
-        </tr>`;
-
-      const d=document.createElement("div");
-      graficos.appendChild(d);
-      barraFutura(d,f.n);
+        const d=document.createElement("div");
+        graficos.appendChild(d);
+        barraFutura(d,item.n);
+      }
     });
 
     kAsistencia.innerText=ok+"/3";
