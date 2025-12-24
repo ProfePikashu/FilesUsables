@@ -181,13 +181,31 @@ button{
 </div>
 
 <script>
+/* ===== CONFIG ===== */
 const API_URL="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
 const CFG={
-  "1er":{total:11400,min:8550},
-  "2da":{total:6800,min:5100},
-  "3er":{total:7600,min:5700}
+  "1er":{nombre:"Primer Clase", total:11400, min:8550},
+  "2da":{nombre:"Segunda Clase", total:6800,  min:5100},
+  "3er":{nombre:"Tercer Clase",  total:7600,  min:5700}
 };
+
+/* ===== DOM ===== */
+const btnVer=document.getElementById("btnVer");
+const dniInput=document.getElementById("dniInput");
+const login=document.getElementById("login");
+const contenido=document.getElementById("contenido");
+const nombre=document.getElementById("nombre");
+const dCorreo=document.getElementById("d-correo");
+const dTelefono=document.getElementById("d-telefono");
+const dTwitch=document.getElementById("d-twitch");
+const dObs=document.getElementById("d-obs");
+const tablaClases=document.getElementById("tablaClases");
+const graficos=document.getElementById("graficos");
+const kAsistencia=document.getElementById("k-asistencia");
+const kPorcentaje=document.getElementById("k-porcentaje");
+const kEstado=document.getElementById("k-estado");
+const btnVolver=document.getElementById("btnVolver");
 
 btnVer.onclick=cargar;
 
@@ -200,7 +218,7 @@ function parseTiempo(t){
 }
 
 function barra(el,cfg,real,titulo){
-  let color=cfg.min<=real?"#3cff8f":real>=cfg.min*0.85?"#ffd84c":"#ff4c4c";
+  const color = real>=cfg.min ? "#3cff8f" : real>=cfg.min*0.85 ? "#ffd84c" : "#ff4c4c";
   Plotly.newPlot(el,[{
     type:"bar",
     orientation:"h",
@@ -239,7 +257,7 @@ function cargar(){
     contenido.style.display="block";
     btnVolver.style.display="block";
 
-    nombre.innerText=a["Nombre Completo"];
+    nombre.innerText=a["Nombre Completo"]||"-";
     dCorreo.innerText=a["Correo"]||"-";
     dTelefono.innerText=a["Teléfono (con Código de Área)"]||"-";
     dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"]||"-";
@@ -249,23 +267,24 @@ function cargar(){
     graficos.innerHTML="";
     let ok=0;
 
-    ["1er","2da","3er"].forEach((k,i)=>{
+    Object.keys(CFG).forEach(k=>{
+      const cfg=CFG[k];
       const t=parseTiempo(a[k+"Clase – Tiempo"]);
-      const pct=Math.round(t/CFG[k].total*100);
-      const estado=t>=CFG[k].min?"PRESENTE":"REVISAR";
-      if(t>=CFG[k].min) ok++;
+      const pct=Math.round(t/cfg.total*100);
+      const estado=t>=cfg.min?"PRESENTE":"REVISAR";
+      if(t>=cfg.min) ok++;
 
       tablaClases.innerHTML+=`
         <tr>
-          <td>${k}</td>
-          <td class="${t>=CFG[k].min?"estado-ok":"estado-warn"}">${estado}</td>
-          <td>${a[k+"Clase – Tiempo"]}</td>
+          <td>${cfg.nombre}</td>
+          <td class="${t>=cfg.min?"estado-ok":"estado-warn"}">${estado}</td>
+          <td>${a[k+"Clase – Tiempo"]||"0h 0m 0s"}</td>
           <td>${pct}%</td>
         </tr>`;
 
       const d=document.createElement("div");
       graficos.appendChild(d);
-      barra(d,CFG[k],t,k+" Clase");
+      barra(d,cfg,t,cfg.nombre);
     });
 
     kAsistencia.innerText=ok+"/3";
@@ -278,6 +297,7 @@ function volver(){
   contenido.style.display="none";
   login.style.display="block";
   btnVolver.style.display="none";
+  dniInput.value="";
 }
 </script>
 
