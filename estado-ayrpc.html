@@ -216,6 +216,22 @@ button{
 .btn-ver:hover{
   background:#3cffaa;
 }
+
+  #cronogramaTab{
+  position:fixed;
+  right:0;
+  top:50%;
+  transform:translateY(-50%);
+  background:#6c63ff;
+  color:white;
+  padding:10px 8px;
+  border-radius:8px 0 0 8px;
+  cursor:pointer;
+  z-index:10000;
+  font-size:18px;
+  box-shadow:-3px 0 10px rgba(0,0,0,.5);
+}
+
   
 </style>
 </head>
@@ -266,19 +282,6 @@ button{
 <div class="card">
   <h3>Gráficos</h3>
   <div id="graficos" class="graficos"></div>
-</div>
-
-<div class="card cronograma">
-  <h3>📅 Cronograma</h3>
-  <ul>
-    <li>Clase 1 – <a href="#" target="_blank">Link de clase</a></li>
-    <li>Clase 2 – <a href="#" target="_blank">Link de clase</a></li>
-    <li>Clase 3 – <a href="#" target="_blank">Link de clase</a></li>
-    <li>Clase 4 – <a href="#" target="_blank">Link de clase</a></li>
-    <li>Clase 5 – <a href="#" target="_blank">Link de clase</a></li>
-    <li>Clase 6 – <a href="#" target="_blank">Link de clase</a></li>
-    <li>Clase Final – <a href="#" target="_blank">Link de clase</a></li>
-  </ul>
 </div>
 
 </div>
@@ -462,9 +465,14 @@ function toggleCronograma(){
 
   </div>
 </div>
+  
+<div id="cronogramaTab" onclick="toggleCronograma()">
+  📅
+</div>
 
   
   
 </body>
 </html>
+
 
