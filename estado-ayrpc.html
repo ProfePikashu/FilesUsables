@@ -15,45 +15,120 @@
   --bad:#ff4c4c;
   --neutral:#7a82c8;
 }
+
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#060816;color:#eaeaf0}
-.container{padding:16px;max-width:1200px;margin:auto}
-.card{background:rgba(20,25,60,.92);border:1px solid var(--neon);border-radius:14px;padding:16px;margin-bottom:16px}
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Arial;
+  background:#060816;
+  color:#eaeaf0;
+}
+
+.container{
+  padding:16px;
+  max-width:1200px;
+  margin:auto;
+}
+
+.card{
+  background:rgba(20,25,60,.92);
+  border:1px solid var(--neon);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
 h1,h2,h3{margin:0 0 10px}
 
-input,button{width:100%;padding:12px;border-radius:10px;border:none;font-size:16px}
-button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
+input,button{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+
+button{
+  background:var(--neon);
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
 
 #btnVolver{
-  position:fixed;top:10px;left:10px;
-  padding:4px 8px;font-size:11px;
+  position:fixed;
+  top:10px;
+  left:10px;
+  padding:6px 10px;
+  font-size:12px;
   display:none;
   background:rgba(20,25,60,.92);
   border:1px solid var(--neon);
   border-radius:6px;
 }
 
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
-.kpi{background:#0d1230;border-radius:12px;padding:12px;text-align:center}
-.kpi span{display:block;font-size:22px;font-weight:bold}
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+  gap:12px;
+}
 
-.datos{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:800px){.datos{grid-template-columns:1fr}}
+.kpi{
+  background:#0d1230;
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+}
 
-.tabla{width:100%;border-collapse:collapse}
-.tabla td{padding:10px;border-bottom:1px solid rgba(255,255,255,.15)}
+.kpi span{
+  display:block;
+  font-size:22px;
+  font-weight:bold;
+}
+
+.datos{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+@media(max-width:800px){
+  .datos{grid-template-columns:1fr}
+}
+
+.tabla{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.tabla td{
+  padding:10px;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
 
 .estado-ok{color:var(--ok);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
 .estado-neutral{color:var(--neutral);font-weight:bold}
 
-.graficos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.graficos{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:24px;
+}
 
 #debug{
   margin-top:10px;
   font-size:12px;
   color:#aaa;
   white-space:pre-wrap;
+}
+
+.cronograma a{
+  color:#6c63ff;
+  text-decoration:none;
+}
+.cronograma a:hover{
+  text-decoration:underline;
 }
 </style>
 </head>
@@ -106,11 +181,24 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
   <div id="graficos" class="graficos"></div>
 </div>
 
+<div class="card cronograma">
+  <h3>📅 Cronograma</h3>
+  <ul>
+    <li>Clase 1 – <a href="#" target="_blank">Link de clase</a></li>
+    <li>Clase 2 – <a href="#" target="_blank">Link de clase</a></li>
+    <li>Clase 3 – <a href="#" target="_blank">Link de clase</a></li>
+    <li>Clase 4 – <a href="#" target="_blank">Link de clase</a></li>
+    <li>Clase 5 – <a href="#" target="_blank">Link de clase</a></li>
+    <li>Clase 6 – <a href="#" target="_blank">Link de clase</a></li>
+    <li>Clase Final – <a href="#" target="_blank">Link de clase</a></li>
+  </ul>
+</div>
+
 </div>
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
+const API = "https://script.google.com/macros/s/AKfycbwkePWjJYOgtwNbrfzFW7bA_jwcJd-p1VflvYs087BC3zGKta0WsdDEsqstj7nUEUWC/exec";
 
 const ORDEN = [
  {n:"Primera Clase",k:"1er"},
@@ -128,7 +216,6 @@ const CFG={
  "3er":{total:7600,min:5700}
 };
 
-// DOM
 const login = document.getElementById("login");
 const contenido = document.getElementById("contenido");
 const btnVolver = document.getElementById("btnVolver");
@@ -152,18 +239,20 @@ btnVolver.onclick = volver;
 
 function log(m){ debug.textContent += m+"\n"; }
 
-function cargar(){
+async function cargar(){
   const dni = document.getElementById("dniInput").value;
   if(!dni) return alert("Ingresá un DNI");
 
-  const s = document.createElement("script");
-  s.src = API + "?dni=" + encodeURIComponent(dni) + "&callback=procesar";
-  document.body.appendChild(s);
+  try{
+    const r = await fetch(API + "?dni=" + encodeURIComponent(dni));
+    const data = await r.json();
+    procesar(data);
+  }catch(e){
+    log("❌ Error de conexión");
+  }
 }
 
 function procesar(a){
-  if(a.error) return alert(a.error);
-
   login.style.display="none";
   contenido.style.display="block";
   btnVolver.style.display="block";
@@ -180,20 +269,21 @@ function procesar(a){
   let ok=0;
 
   ORDEN.forEach((c,i)=>{
-    const est = (a[c.k+"Clase – Presente"]||"-").toUpperCase();
-    const tiempo = a[c.k+"Clase – Tiempo"] || "-";
+    const est=(a[c.k+"Clase – Presente"]||"-").toUpperCase();
+    const tiempo=a[c.k+"Clase – Tiempo"]||"-";
 
     let cls="estado-neutral";
     if(est==="PRESENTE"||est==="RECUPERADA") cls="estado-ok";
     if(est==="AUSENTE") cls="estado-bad";
 
-    tablaClases.innerHTML += `
+    tablaClases.innerHTML+=`
       <tr>
         <td>${c.n}</td>
         <td class="${cls}">${est}</td>
         <td>${tiempo}</td>
         <td>${i<3?"Evaluada":"Pendiente"}</td>
-      </tr>`;
+      </tr>
+    `;
 
     if(i<3 && (est==="PRESENTE"||est==="RECUPERADA")) ok++;
 
