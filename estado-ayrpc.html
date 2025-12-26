@@ -16,48 +16,21 @@
   --neutral:#7a82c8;
 }
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Arial;
-  background:#060816;
-  color:#eaeaf0;
-}
+body{margin:0;font-family:system-ui,Segoe UI,Arial;background:#060816;color:#eaeaf0}
 .container{padding:16px;max-width:1200px;margin:auto}
-.card{
-  background:rgba(20,25,60,.92);
-  border:1px solid var(--neon);
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 0 18px rgba(108,99,255,.25);
-}
+.card{background:rgba(20,25,60,.92);border:1px solid var(--neon);border-radius:14px;padding:16px;margin-bottom:16px}
 h1,h2,h3{margin:0 0 10px}
 
-input,button{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:none;
-  font-size:16px;
-}
-button{
-  background:var(--neon);
-  color:#fff;
-  font-weight:bold;
-  cursor:pointer;
-}
+input,button{width:100%;padding:12px;border-radius:10px;border:none;font-size:16px}
+button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 
 #btnVolver{
-  position:fixed;
-  top:10px;
-  left:10px;
-  padding:4px 8px;
-  font-size:11px;
+  position:fixed;top:10px;left:10px;
+  padding:4px 8px;font-size:11px;
   display:none;
   background:rgba(20,25,60,.92);
   border:1px solid var(--neon);
   border-radius:6px;
-  z-index:9999;
 }
 
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
@@ -68,17 +41,19 @@ button{
 @media(max-width:800px){.datos{grid-template-columns:1fr}}
 
 .tabla{width:100%;border-collapse:collapse}
-.tabla th,.tabla td{padding:10px;border-bottom:1px solid rgba(255,255,255,.15)}
+.tabla td{padding:10px;border-bottom:1px solid rgba(255,255,255,.15)}
 
 .estado-ok{color:var(--ok);font-weight:bold}
 .estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
-.estado-neutral{color:var(--neutral);font-weight:bold}
 
-.graficos{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:24px;
+.graficos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+
+#debug{
+  margin-top:10px;
+  font-size:12px;
+  color:#aaa;
+  white-space:pre-wrap;
 }
 </style>
 </head>
@@ -95,6 +70,7 @@ button{
   <h2>Ingresá tu DNI</h2>
   <input id="dniInput" type="number" placeholder="DNI sin puntos">
   <button onclick="cargar()">Ver mi estado</button>
+  <div id="debug"></div>
 </div>
 
 <div id="contenido" style="display:none">
@@ -109,17 +85,17 @@ button{
 </div>
 
 <div class="card">
-  <h3>Datos de inscripción</h3>
+  <h3>Datos</h3>
   <div class="datos">
     <div><b>Correo:</b> <span id="d-correo"></span></div>
     <div><b>Teléfono:</b> <span id="d-telefono"></span></div>
     <div><b>Twitch:</b> <span id="d-twitch"></span></div>
-    <div><b>Observaciones:</b> <span id="d-obs"></span></div>
+    <div><b>Obs:</b> <span id="d-obs"></span></div>
   </div>
 </div>
 
 <div class="card">
-  <h3>Situación por clase</h3>
+  <h3>Clases</h3>
   <table class="tabla">
     <tbody id="tablaClases"></tbody>
   </table>
@@ -134,9 +110,9 @@ button{
 </div>
 
 <script>
-const API="https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
+const API = "https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-const ORDEN=[
+const ORDEN = [
  {n:"Primera Clase",k:"1er"},
  {n:"Segunda Clase",k:"2da"},
  {n:"Tercera Clase",k:"3er"},
@@ -152,25 +128,39 @@ const CFG={
  "3er":{total:7600,min:5700}
 };
 
+function log(msg){
+  console.log(msg);
+  document.getElementById("debug").textContent += msg + "\n";
+}
+
 function cargar(){
-  const dni=document.getElementById("dniInput").value;
-  const s=document.createElement("script");
-  s.src=API+"?dni="+dni+"&callback=procesar";
+  const dni = document.getElementById("dniInput").value;
+  log("➡️ Consultando DNI: " + dni);
+
+  const s = document.createElement("script");
+  s.src = API + "?dni=" + dni + "&callback=procesar";
+  s.onerror = () => log("❌ Error cargando el script (Apps Script no respondió)");
   document.body.appendChild(s);
 }
 
 function procesar(a){
-  if(a.error){alert(a.error);return;}
+  log("✅ Respuesta recibida");
+
+  if(a.error){
+    log("⚠️ Error backend: " + a.error);
+    alert(a.error);
+    return;
+  }
 
   login.style.display="none";
   contenido.style.display="block";
   btnVolver.style.display="block";
 
-  nombre.innerText=a["Nombre Completo"];
-  dCorreo.innerText=a["Correo"];
-  dTelefono.innerText=a["Teléfono (con Código de Área)"];
-  dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
-  dObs.innerText=a["Observaciones"];
+  nombre.innerText = a["Nombre Completo"];
+  dCorreo.innerText = a["Correo"];
+  dTelefono.innerText = a["Teléfono (con Código de Área)"];
+  dTwitch.innerText = a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
+  dObs.innerText = a["Observaciones"];
 
   tablaClases.innerHTML="";
   graficos.innerHTML="";
@@ -204,7 +194,6 @@ function procesar(a){
   kAsistencia.innerText=ok+"/3";
   kPorcentaje.innerText=Math.round(ok/3*100)+"%";
   kEstado.innerText=ok===3?"EXCELENTE":ok===2?"DEBE 1 CLASE":"RIESGO";
-  kEstado.className=ok===3?"estado-ok":ok===2?"estado-warn":"estado-bad";
 }
 
 function parseT(t){
