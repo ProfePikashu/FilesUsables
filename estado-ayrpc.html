@@ -44,8 +44,8 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 .tabla td{padding:10px;border-bottom:1px solid rgba(255,255,255,.15)}
 
 .estado-ok{color:var(--ok);font-weight:bold}
-.estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
+.estado-neutral{color:var(--neutral);font-weight:bold}
 
 .graficos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
 
@@ -60,7 +60,7 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 
 <body>
 
-<button id="btnVolver" onclick="volver()">← Volver</button>
+<button id="btnVolver">← Volver</button>
 
 <div class="container">
 
@@ -69,7 +69,7 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 <div class="card" id="login">
   <h2>Ingresá tu DNI</h2>
   <input id="dniInput" type="number" placeholder="DNI sin puntos">
-  <button onclick="cargar()">Ver mi estado</button>
+  <button id="btnBuscar">Ver mi estado</button>
   <div id="debug"></div>
 </div>
 
@@ -128,39 +128,51 @@ const CFG={
  "3er":{total:7600,min:5700}
 };
 
-function log(msg){
-  console.log(msg);
-  document.getElementById("debug").textContent += msg + "\n";
-}
+// DOM
+const login = document.getElementById("login");
+const contenido = document.getElementById("contenido");
+const btnVolver = document.getElementById("btnVolver");
+const debug = document.getElementById("debug");
+
+const nombre = document.getElementById("nombre");
+const dCorreo = document.getElementById("d-correo");
+const dTelefono = document.getElementById("d-telefono");
+const dTwitch = document.getElementById("d-twitch");
+const dObs = document.getElementById("d-obs");
+
+const tablaClases = document.getElementById("tablaClases");
+const graficos = document.getElementById("graficos");
+
+const kAsistencia = document.getElementById("k-asistencia");
+const kPorcentaje = document.getElementById("k-porcentaje");
+const kEstado = document.getElementById("k-estado");
+
+document.getElementById("btnBuscar").onclick = cargar;
+btnVolver.onclick = volver;
+
+function log(m){ debug.textContent += m+"\n"; }
 
 function cargar(){
   const dni = document.getElementById("dniInput").value;
-  log("➡️ Consultando DNI: " + dni);
+  if(!dni) return alert("Ingresá un DNI");
 
   const s = document.createElement("script");
-  s.src = API + "?dni=" + dni + "&callback=procesar";
-  s.onerror = () => log("❌ Error cargando el script (Apps Script no respondió)");
+  s.src = API + "?dni=" + encodeURIComponent(dni) + "&callback=procesar";
   document.body.appendChild(s);
 }
 
 function procesar(a){
-  log("✅ Respuesta recibida");
-
-  if(a.error){
-    log("⚠️ Error backend: " + a.error);
-    alert(a.error);
-    return;
-  }
+  if(a.error) return alert(a.error);
 
   login.style.display="none";
   contenido.style.display="block";
   btnVolver.style.display="block";
 
-  nombre.innerText = a["Nombre Completo"];
-  dCorreo.innerText = a["Correo"];
-  dTelefono.innerText = a["Teléfono (con Código de Área)"];
-  dTwitch.innerText = a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
-  dObs.innerText = a["Observaciones"];
+  nombre.textContent = a["Nombre Completo"];
+  dCorreo.textContent = a["Correo"];
+  dTelefono.textContent = a["Teléfono (con Código de Área)"];
+  dTwitch.textContent = a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
+  dObs.textContent = a["Observaciones"];
 
   tablaClases.innerHTML="";
   graficos.innerHTML="";
@@ -168,32 +180,33 @@ function procesar(a){
   let ok=0;
 
   ORDEN.forEach((c,i)=>{
-    const est=(a[c.k+"Clase – Presente"]||"-").toUpperCase();
-    const tiempo=a[c.k+"Clase – Tiempo"]||"-";
+    const est = (a[c.k+"Clase – Presente"]||"-").toUpperCase();
+    const tiempo = a[c.k+"Clase – Tiempo"] || "-";
 
-    let css="estado-neutral";
-    if(est==="PRESENTE"||est==="RECUPERADA") css="estado-ok";
-    else if(est==="AUSENTE") css="estado-bad";
+    let cls="estado-neutral";
+    if(est==="PRESENTE"||est==="RECUPERADA") cls="estado-ok";
+    if(est==="AUSENTE") cls="estado-bad";
 
-    tablaClases.innerHTML+=`
+    tablaClases.innerHTML += `
       <tr>
         <td>${c.n}</td>
-        <td class="${css}">${est}</td>
+        <td class="${cls}">${est}</td>
         <td>${tiempo}</td>
         <td>${i<3?"Evaluada":"Pendiente"}</td>
-      </tr>
-    `;
+      </tr>`;
 
     if(i<3 && (est==="PRESENTE"||est==="RECUPERADA")) ok++;
 
-    const div=document.createElement("div");
-    graficos.appendChild(div);
-    grafico(div,c,tiempo);
+    if(CFG[c.k]){
+      const div=document.createElement("div");
+      graficos.appendChild(div);
+      grafico(div,c,tiempo);
+    }
   });
 
-  kAsistencia.innerText=ok+"/3";
-  kPorcentaje.innerText=Math.round(ok/3*100)+"%";
-  kEstado.innerText=ok===3?"EXCELENTE":ok===2?"DEBE 1 CLASE":"RIESGO";
+  kAsistencia.textContent = ok+"/3";
+  kPorcentaje.textContent = Math.round(ok/3*100)+"%";
+  kEstado.textContent = ok===3?"EXCELENTE":ok===2?"DEBE 1 CLASE":"RIESGO";
 }
 
 function parseT(t){
@@ -205,7 +218,6 @@ function parseT(t){
 }
 
 function grafico(el,c,t){
-  if(!CFG[c.k]) return;
   const seg=parseT(t);
   Plotly.newPlot(el,[{
     type:"bar",
