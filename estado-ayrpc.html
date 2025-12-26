@@ -130,6 +130,93 @@ button{
 .cronograma a:hover{
   text-decoration:underline;
 }
+
+
+/* ============================
+   CRONOGRAMA LATERAL
+============================ */
+
+.cronograma-panel{
+  position:fixed;
+  top:80px;
+  right:-320px;
+  width:320px;
+  height:auto;
+  background:linear-gradient(180deg,#1a1f4d,#0c1028);
+  border-left:2px solid #6c63ff;
+  border-radius:12px 0 0 12px;
+  box-shadow:-6px 0 20px rgba(0,0,0,.5);
+  transition:.4s;
+  z-index:9999;
+  overflow:hidden;
+}
+
+.cronograma-panel.open{
+  right:0;
+}
+
+.cronograma-header{
+  background:linear-gradient(90deg,#6c63ff,#8b5cf6);
+  padding:12px;
+  font-weight:bold;
+  cursor:pointer;
+  text-align:center;
+  color:white;
+}
+
+.cronograma-header small{
+  display:block;
+  font-size:11px;
+  opacity:.8;
+}
+
+.cronograma-body{
+  padding:12px;
+  font-size:14px;
+}
+
+.cronograma-body h4{
+  margin:10px 0 6px;
+  color:#9fa8ff;
+}
+
+.clase{
+  background:rgba(255,255,255,.06);
+  padding:8px;
+  border-radius:8px;
+  margin-bottom:6px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.clase.done{
+  border-left:4px solid #3cff8f;
+}
+
+.clase.future{
+  border-left:4px solid #7a82c8;
+  opacity:.9;
+}
+
+.clase.last{
+  border-left:4px solid #ff4c4c;
+}
+
+.btn-ver{
+  background:#2bdc8c;
+  color:#000;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+.btn-ver:hover{
+  background:#3cffaa;
+}
+  
 </style>
 </head>
 
@@ -329,7 +416,55 @@ function volver(){
   login.style.display="block";
   btnVolver.style.display="none";
 }
+
+function toggleCronograma(){
+  document.getElementById("cronogramaPanel")
+    .classList.toggle("open");
+}
+
 </script>
 
+<!-- CRONOGRAMA LATERAL -->
+<div id="cronogramaPanel" class="cronograma-panel">
+
+  <div class="cronograma-header" onclick="toggleCronograma()">
+    📅 Cronograma y Temario
+    <small>Siempre a las 19:30 hs</small>
+  </div>
+
+  <div class="cronograma-body">
+
+    <h4>Clases dictadas (recuperables)</h4>
+
+    <div class="clase done">
+      <span>🧩 29/11/2025 – Armado y Componentes</span>
+      <a href="#" target="_blank" class="btn-ver">Ver grabación</a>
+    </div>
+
+    <div class="clase done">
+      <span>💿 13/12/2025 – Instalación de SO y Drivers</span>
+      <a href="#" target="_blank" class="btn-ver">Ver grabación</a>
+    </div>
+
+    <div class="clase done">
+      <span>⚙️ 20/12/2025 – Programación de BIOS</span>
+      <a href="#" target="_blank" class="btn-ver">Ver grabación</a>
+    </div>
+
+    <hr>
+
+    <h4>Clases de Enero 2026</h4>
+
+    <div class="clase future">🧠 03/01/2026 – Software y Herramientas</div>
+    <div class="clase future">🧷 10/01/2026 – Microsoldaduras</div>
+    <div class="clase future">🧯 17/01/2026 – Solución de Problemas</div>
+    <div class="clase future last">🦠 24/01/2026 – Virus y Malware (Última)</div>
+
+  </div>
+</div>
+
+  
+  
 </body>
 </html>
+
