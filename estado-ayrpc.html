@@ -8,7 +8,6 @@
 <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
 
 <style>
-/* === CSS ORIGINAL INTACTO === */
 :root{
   --neon:#6c63ff;
   --ok:#3cff8f;
@@ -46,44 +45,21 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
 .estado-warn{color:var(--warn);font-weight:bold}
 .estado-bad{color:var(--bad);font-weight:bold}
 .estado-neutral{color:var(--neutral);font-weight:bold}
-
-.graficos{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:32px}
-
-.cronograma-btn{
-  position:fixed;right:0;top:40%;
-  background:#6a00ff;color:#fff;
-  padding:12px 10px;font-weight:bold;
-  border-radius:8px 0 0 8px;
-  display:none;z-index:1000
-}
-
-.cronograma-panel{
-  position:fixed;top:0;right:-420px;
-  width:420px;height:100%;
-  background:#0e0e16;z-index:1001;
-  transition:right .35s
-}
-.cronograma-panel.open{right:0}
-
-#cronogramaOverlay{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.45);
-  display:none;z-index:1000
-}
 </style>
 </head>
 
 <body>
 
-<button id="btnVolver">← Volver</button>
+<button id="btnVolver" onclick="volver()">← Volver</button>
 
 <div class="container">
+
 <h1>⚡ AyRPC – Estado Académico</h1>
 
 <div class="card" id="login">
   <h2>Ingresá tu DNI</h2>
   <input id="dniInput" type="number" placeholder="DNI sin puntos">
-  <button id="btnVer">Ver mi estado</button>
+  <button onclick="cargar()">Ver mi estado</button>
 </div>
 
 <div id="contenido" style="display:none">
@@ -102,7 +78,7 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
   <div class="datos">
     <div><b>Correo:</b> <span id="d-correo"></span></div>
     <div><b>Teléfono:</b> <span id="d-telefono"></span></div>
-    <div><b>Usuario Twitch:</b> <span id="d-twitch"></span></div>
+    <div><b>Twitch:</b> <span id="d-twitch"></span></div>
     <div><b>Observaciones:</b> <span id="d-obs"></span></div>
   </div>
 </div>
@@ -114,110 +90,86 @@ button{background:var(--neon);color:#fff;font-weight:bold;cursor:pointer}
   </table>
 </div>
 
-<div class="card">
-  <h3>Gráficos por clase</h3>
-  <div class="graficos" id="graficos"></div>
-</div>
-
 </div>
 </div>
-
-<button id="btnCronograma" class="cronograma-btn">📘 Cronograma</button>
-<div id="cronogramaOverlay"></div>
-<div id="cronogramaPanel" class="cronograma-panel"></div>
 
 <script>
-/* === DOM === */
-const API_URL="https://script.google.com/macros/s/AKfycbwkePWjJYOgtwNbrfzFW7bA_jwcJd-p1VflvYs087BC3zGKta0WsdDEsqstj7nUEUWC/exec";
+const API =
+"https://script.google.com/macros/s/AKfycbxPHF_PgloIlOJet5sR9EP8BP60XkmPpCHtzHP0cTBBdDlDpYi8Cy4QXfxV-im9aabt/exec";
 
-const btnVer=document.getElementById("btnVer");
-const btnVolver=document.getElementById("btnVolver");
-const btnCronograma=document.getElementById("btnCronograma");
-const cronogramaPanel=document.getElementById("cronogramaPanel");
-const cronogramaOverlay=document.getElementById("cronogramaOverlay");
-
-const dniInput=document.getElementById("dniInput");
-const login=document.getElementById("login");
-const contenido=document.getElementById("contenido");
-
-const nombre=document.getElementById("nombre");
-const dCorreo=document.getElementById("d-correo");
-const dTelefono=document.getElementById("d-telefono");
-const dTwitch=document.getElementById("d-twitch");
-const dObs=document.getElementById("d-obs");
-
-const kAsistencia=document.getElementById("k-asistencia");
-const kPorcentaje=document.getElementById("k-porcentaje");
-const kEstado=document.getElementById("k-estado");
-
-const tablaClases=document.getElementById("tablaClases");
-const graficos=document.getElementById("graficos");
-
-const ORDEN=[
-  {n:"Primer Clase",k:"1er"},
-  {n:"Segunda Clase",k:"2da"},
-  {n:"Tercer Clase",k:"3er"},
-  {n:"Cuarta Clase",k:"4ta"},
-  {n:"Quinta Clase",k:"5ta"},
-  {n:"Sexta Clase",k:"6ta"},
-  {n:"Última Clase",k:"Ultima"}
+const ORDEN = [
+  {n:"Primera Clase", k:"1er"},
+  {n:"Segunda Clase", k:"2da"},
+  {n:"Tercera Clase", k:"3er"},
+  {n:"Cuarta Clase", k:"4ta"},
+  {n:"Quinta Clase", k:"5ta"},
+  {n:"Sexta Clase", k:"6ta"},
+  {n:"Última Clase", k:"Ultima"}
 ];
 
-btnVer.onclick=cargar;
-btnVolver.onclick=volver;
-
 function cargar(){
-  fetch(API_URL+"?dni="+dniInput.value)
-  .then(r=>r.json())
-  .then(a=>{
-    if(a.error){alert(a.error);return;}
+  const dni = document.getElementById("dniInput").value;
 
-    login.style.display="none";
-    contenido.style.display="block";
-    btnVolver.style.display="block";
-    btnCronograma.style.display="block";
+  const s = document.createElement("script");
+  s.src = API + "?dni=" + dni + "&callback=procesar";
+  document.body.appendChild(s);
+}
 
-    nombre.innerText=a["Nombre Completo"]||"-";
-    dCorreo.innerText=a["Correo"]||"-";
-    dTelefono.innerText=a["Teléfono (con Código de Área)"]||"-";
-    dTwitch.innerText=a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"]||"-";
-    dObs.innerText=a["Observaciones"]||"-";
+function procesar(a){
 
-    tablaClases.innerHTML="";
-    graficos.innerHTML="";
+  if(a.error){
+    alert(a.error);
+    return;
+  }
 
-    let totalValidas=0;
+  document.getElementById("login").style.display="none";
+  document.getElementById("contenido").style.display="block";
+  document.getElementById("btnVolver").style.display="block";
 
-    ORDEN.forEach((item,i)=>{
-      const estado=(a[item.k+"Clase – Presente"]||"-").toUpperCase();
-      const tiempo=a[item.k+"Clase – Tiempo"]||"-";
-      if(i<3 && (estado==="PRESENTE"||estado==="RECUPERADA")) totalValidas++;
+  document.getElementById("nombre").innerText = a["Nombre Completo"];
+  document.getElementById("d-correo").innerText = a["Correo"];
+  document.getElementById("d-telefono").innerText = a["Teléfono (con Código de Área)"];
+  document.getElementById("d-twitch").innerText = a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
+  document.getElementById("d-obs").innerText = a["Observaciones"];
 
-      tablaClases.innerHTML+=`
-        <tr>
-          <td>${item.n}</td>
-          <td>${estado}</td>
-          <td>${tiempo}</td>
-          <td>-</td>
-        </tr>`;
-    });
+  let total = 0;
+  let tabla = "";
 
-    kAsistencia.innerText=totalValidas+"/3";
-    kPorcentaje.innerText=Math.round(totalValidas/3*100)+"%";
-    kEstado.innerText= totalValidas===3?"EXCELENTE":totalValidas===0?"RIESGO DE BAJA":"DEBE CLASES";
+  ORDEN.forEach((c,i)=>{
+    const estado = a[c.k+"Clase – Presente"] || "-";
+    const tiempo = a[c.k+"Clase – Tiempo"] || "-";
+
+    if(i < 3){
+      if(estado === "PRESENTE" || estado === "RECUPERADA"){
+        total++;
+      }
+    }
+
+    tabla += `
+      <tr>
+        <td>${c.n}</td>
+        <td>${estado}</td>
+        <td>${tiempo}</td>
+        <td>${i < 3 ? "Evaluada" : "Pendiente"}</td>
+      </tr>`;
   });
+
+  document.getElementById("tablaClases").innerHTML = tabla;
+
+  document.getElementById("k-asistencia").innerText = total + "/3";
+  document.getElementById("k-porcentaje").innerText = Math.round(total/3*100) + "%";
+  document.getElementById("k-estado").innerText =
+    total === 3 ? "EXCELENTE" :
+    total === 2 ? "DEBE 1 CLASE" :
+    "RIESGO DE BAJA";
 }
 
 function volver(){
-  contenido.style.display="none";
-  login.style.display="block";
-  btnVolver.style.display="none";
-  btnCronograma.style.display="none";
-  cronogramaPanel.classList.remove("open");
-  cronogramaOverlay.style.display="none";
+  document.getElementById("contenido").style.display="none";
+  document.getElementById("login").style.display="block";
+  document.getElementById("btnVolver").style.display="none";
 }
 </script>
 
 </body>
 </html>
-
