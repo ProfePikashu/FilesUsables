@@ -157,10 +157,33 @@ button{
   background:linear-gradient(90deg,#6c63ff,#8b5cf6);
   padding:12px;
   font-weight:bold;
-  cursor:pointer;
-  text-align:center;
   color:white;
+  text-align:left;
 }
+
+.cronograma-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+#btnCronograma{
+  width:auto;
+  padding:6px 10px;
+  font-size:12px;
+  border-radius:8px;
+  border:none;
+  background:#ffffff;
+  color:#3b36ff;
+  cursor:pointer;
+  font-weight:800;
+}
+
+#btnCronograma:hover{
+  background:#e9e9ff;
+}
+
 
 .cronograma-header small{
   display:block;
@@ -215,21 +238,7 @@ button{
   background:#3cffaa;
 }
 
-  #cronogramaTab{
-  position:fixed;
-  right:0;
-  top:50%;
-  transform:translateY(-50%);
-  background:#6c63ff;
-  color:white;
-  padding:10px 8px;
-  border-radius:8px 0 0 8px;
-  cursor:pointer;
-  z-index:10000;
-  font-size:18px;
-  box-shadow:-3px 0 10px rgba(0,0,0,.5);
-}
-
+  
 .loader{
   width:32px;
   height:32px;
@@ -464,19 +473,32 @@ function volver(){
 }
 
 function toggleCronograma(){
-  document.getElementById("cronogramaPanel")
-    .classList.toggle("open");
+  const panel = document.getElementById("cronogramaPanel");
+  const btn = document.getElementById("btnCronograma");
+
+  panel.classList.toggle("open");
+
+  if(panel.classList.contains("open")){
+    btn.style.display = "none";
+  }else{
+    btn.style.display = "inline-block";
+  }
 }
+
 
 </script>
 
 <!-- CRONOGRAMA LATERAL -->
 <div id="cronogramaPanel" class="cronograma-panel">
 
-  <div class="cronograma-header" onclick="toggleCronograma()">
-    📅 Cronograma y Temario
+  <div class="cronograma-header">
+    <div class="cronograma-top">
+      <span>📅 Cronograma y Temario</span>
+      <button id="btnCronograma" type="button" onclick="toggleCronograma()">Abrir</button>
+    </div>
     <small>Siempre a las 19:30 hs</small>
   </div>
+
 
   <div class="cronograma-body">
 
@@ -507,12 +529,9 @@ function toggleCronograma(){
     <div class="clase future last">🦠 24/01/2026 – Virus y Malware (Última)</div>
 
   </div>
-</div>
-  
-<div id="cronogramaTab" onclick="toggleCronograma()">
-  📅 Cronograma y Temario
 </div>  
-  
+
 </body>
 </html>
+
 
