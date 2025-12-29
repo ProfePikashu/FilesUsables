@@ -254,6 +254,7 @@ button{
 }
 
 #btnAbrirCronograma{
+  width:auto;
   position:fixed;
   bottom:20px;
   right:20px;
@@ -496,16 +497,17 @@ function volver(){
 
 function toggleCronograma(){
   const panel = document.getElementById("cronogramaPanel");
-  const btn = document.getElementById("btnAbrirCronograma");
+  const btnFloating = document.getElementById("btnAbrirCronograma");
+  const btnInside = document.getElementById("btnCronograma");
 
   panel.classList.toggle("open");
 
-  if(panel.classList.contains("open")){
-    btn.style.display = "none";
-  }else{
-    btn.style.display = "block";
-  }
+  const abierto = panel.classList.contains("open");
+
+  if(btnFloating) btnFloating.style.display = abierto ? "none" : "block";
+  if(btnInside) btnInside.textContent = abierto ? "Cerrar" : "Abrir";
 }
+
 
 </script>
 
@@ -559,6 +561,7 @@ function toggleCronograma(){
 
 </body>
 </html>
+
 
 
 
