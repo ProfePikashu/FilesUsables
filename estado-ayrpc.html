@@ -252,6 +252,28 @@ button{
 @keyframes spin{
   to{ transform: rotate(360deg); }
 }
+
+#btnAbrirCronograma{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#6c63ff;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:9000;
+  box-shadow:0 0 15px rgba(0,0,0,.4);
+}
+
+#btnAbrirCronograma:hover{
+  background:#7c74ff;
+}
+
+  
+
   
 </style>
 </head>
@@ -474,17 +496,16 @@ function volver(){
 
 function toggleCronograma(){
   const panel = document.getElementById("cronogramaPanel");
-  const btn = document.getElementById("btnCronograma");
+  const btn = document.getElementById("btnAbrirCronograma");
 
   panel.classList.toggle("open");
 
   if(panel.classList.contains("open")){
     btn.style.display = "none";
   }else{
-    btn.style.display = "inline-block";
+    btn.style.display = "block";
   }
 }
-
 
 </script>
 
@@ -531,7 +552,13 @@ function toggleCronograma(){
   </div>
 </div>  
 
+<button id="btnAbrirCronograma" onclick="toggleCronograma()">
+  📅 Cronograma y temario
+</button>
+
+
 </body>
 </html>
+
 
 
