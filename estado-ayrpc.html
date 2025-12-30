@@ -279,73 +279,82 @@ button{
 }
 
 /* ============================
-   PANEL DE CONTACTO
+   PANEL CONTACTO (NUEVO)
 ============================ */
 
 .contacto-panel{
+  position:fixed;
+  top:80px;
+  right:-260px;
+  width:260px;
   background:linear-gradient(180deg,#1a1f4d,#0c1028);
-  border:1px solid var(--neon);
-  border-radius:14px;
-  padding:14px;
-  margin-bottom:14px;
-  box-shadow:0 0 20px rgba(0,0,0,.4);
+  border-left:2px solid var(--neon);
+  border-radius:12px 0 0 12px;
+  padding:12px;
+  box-shadow:-6px 0 20px rgba(0,0,0,.5);
+  transition:.35s ease;
+  z-index:9998;
 }
 
-.contacto-panel h4{
-  margin:0 0 10px;
-  color:#9fa8ff;
-  font-size:15px;
+.contacto-panel.open{
+  right:20px;
 }
 
-.contacto-botones{
+.contacto-grid{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:14px;
 }
 
-.btn-contacto{
+/* Botón/icono */
+.contacto-item{
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:10px;
-  font-weight:600;
-  text-decoration:none;
-  color:#fff;
+  gap:12px;
   background:#2b2f66;
-  transition:.2s;
+  padding:10px;
+  border-radius:12px;
+  cursor:pointer;
+  transition:.25s;
+  overflow:hidden;
 }
 
-.btn-contacto:hover{
+.contacto-item:hover{
   background:#3b40a0;
-  transform:translateY(-1px);
+  transform:scale(1.03);
 }
 
-.btn-contacto img{
-  width:22px;
-  height:22px;
-}
-
-.icono-comunidad{
+/* icono */
+.contacto-item img{
   width:40px;
   height:40px;
   border-radius:50%;
   object-fit:cover;
-
-  /* Glow neon */
   box-shadow:
     0 0 6px rgba(108,99,255,.8),
-    0 0 14px rgba(108,99,255,.6),
-    0 0 22px rgba(108,99,255,.4);
-
-  border:2px solid #6c63ff;
-  background:#000;
+    0 0 14px rgba(108,99,255,.5);
 }
 
+/* texto oculto */
+.contacto-texto{
+  white-space:nowrap;
+  opacity:0;
+  transform:translateX(-10px);
+  transition:.25s;
+  font-weight:600;
+  color:#fff;
+}
+
+/* aparece al hover */
+.contacto-item:hover .contacto-texto{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/* botón flotante */
 #btnContacto{
-  width:auto;
   position:fixed;
-  bottom:72px;            /* arriba del botón Cronograma */
+  bottom:72px;
   right:20px;
   background:#6c63ff;
   color:white;
@@ -354,33 +363,12 @@ button{
   padding:10px 14px;
   font-weight:bold;
   cursor:pointer;
-  z-index:9001;
-  box-shadow:0 0 15px rgba(0,0,0,.4);
+  z-index:9999;
   display:flex;
   align-items:center;
   gap:8px;
+  box-shadow:0 0 15px rgba(0,0,0,.4);
 }
-
-#btnContacto:hover{
-  background:#7c74ff;
-}
-
-#btnContacto img{
-  width:18px;
-  height:18px;
-}
-
-/* panel contacto flotante (arriba del cronograma) */
-.contacto-panel{
-  position:fixed;
-  bottom:120px;           /* queda arriba de Contacto y Cronograma */
-  right:20px;
-  width:320px;
-  margin:0;
-  display:none;           /* arranca cerrado */
-  z-index:9002;
-}
-
 
   
 </style>
@@ -678,31 +666,31 @@ document.addEventListener("click", (e)=>{
   </div>
 </div>
 
-<button id="btnContacto" onclick="toggleContacto()">
-  <img src="icons/icon-buzon.png" alt="">
-  💌​ Contacto
-</button>
-
 <button id="btnAbrirCronograma" onclick="toggleCronograma()">
   📅 Cronograma y temario
 </button>
 
-<div class="contacto-panel" id="panelContacto">
-  <div class="contacto-botones">
+<button id="btnContacto" onclick="toggleContacto()">
+  <img src="icons/icon-buzon.png" width="18">
+  💌 Contacto
+</button>
 
-    <a href="https://wa.me/5492236689580" target="_blank" class="btn-contacto">
-      <img src="icons/whatsapp.png" alt="">
-      Contactar al Profe (WhatsApp)
+<div id="panelContacto" class="contacto-panel">
+  <div class="contacto-grid">
+
+    <a class="contacto-item" href="https://wa.me/5492236689580" target="_blank">
+      <img src="icons/whatsapp.png">
+      <span class="contacto-texto">Contactar al Profe (WhatsApp)</span>
     </a>
 
-    <a href="mailto:acoria@frba.utn.edu.ar" class="btn-contacto">
-      <img src="icons/mail.png" alt="">
-      Contactar al Profe (Mail)
+    <a class="contacto-item" href="mailto:acoria@frba.utn.edu.ar">
+      <img src="icons/mail.png">
+      <span class="contacto-texto">Contactar al Profe (Mail)</span>
     </a>
 
-    <a href="https://chat.whatsapp.com/LczmlYvVzWf2SDStqVMUqW" target="_blank" class="btn-contacto">
-      <img src="icons/comunidad.png" alt="">
-      Comunidad AyRPC (WhatsApp)
+    <a class="contacto-item" href="https://chat.whatsapp.com/LczmlYvVzWf2SDStqVMUqW" target="_blank">
+      <img src="icons/comunidad.png">
+      <span class="contacto-texto">Comunidad AyRPC</span>
     </a>
 
   </div>
@@ -710,3 +698,4 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
