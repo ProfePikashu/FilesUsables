@@ -285,15 +285,15 @@ button{
 .contacto-panel{
   position:fixed;
   top:80px;
-  right:-260px;
-  width:260px;
+  right:-280px;
+  width:280px;
   background:linear-gradient(180deg,#1a1f4d,#0c1028);
   border-left:2px solid var(--neon);
   border-radius:12px 0 0 12px;
   padding:12px;
   box-shadow:-6px 0 20px rgba(0,0,0,.5);
-  transition:.35s ease;
-  z-index:10001;
+  transition:.4s;
+  z-index:9999;
 }
 
 .contacto-panel.open{
@@ -370,6 +370,25 @@ button{
   box-shadow:0 0 15px rgba(0,0,0,.4);
 }
 
+#btnAbrirContacto{
+  position:fixed;
+  bottom:72px;
+  right:20px;
+  background:#6c63ff;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:9001;
+  box-shadow:0 0 15px rgba(0,0,0,.4);
+  transition:.2s;
+}
+
+#btnAbrirContacto:hover{
+  background:#7c74ff;
+}
   
 </style>
 </head>
@@ -613,16 +632,14 @@ function toggleContacto(){
 
 document.addEventListener("click", (e)=>{
   const panel = document.getElementById("panelContacto");
-  const btn = document.getElementById("btnContacto");
-
-  if(!panel || !btn) return;
+  const btn = document.getElementById("btnAbrirContacto");
 
   if(!panel.classList.contains("open")) return;
-
   if(panel.contains(e.target) || btn.contains(e.target)) return;
 
   panel.classList.remove("open");
 });
+
 
 </script>
 
@@ -674,10 +691,10 @@ document.addEventListener("click", (e)=>{
   📅 Cronograma y temario
 </button>
 
-<button id="btnContacto" onclick="toggleContacto()">
-  <img src="icons/icon-buzon.png" width="18">
+<button id="btnAbrirContacto" onclick="toggleContacto()">
   💌 Contacto
 </button>
+
 
 <div id="panelContacto" class="contacto-panel">
   <div class="contacto-grid">
@@ -702,6 +719,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
