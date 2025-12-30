@@ -277,6 +277,72 @@ button{
 #btnAbrirCronograma:hover{
   background:#7c74ff;
 }
+
+/* ============================
+   PANEL DE CONTACTO
+============================ */
+
+.contacto-panel{
+  background:linear-gradient(180deg,#1a1f4d,#0c1028);
+  border:1px solid var(--neon);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  box-shadow:0 0 20px rgba(0,0,0,.4);
+}
+
+.contacto-panel h4{
+  margin:0 0 10px;
+  color:#9fa8ff;
+  font-size:15px;
+}
+
+.contacto-botones{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.btn-contacto{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:10px;
+  font-weight:600;
+  text-decoration:none;
+  color:#fff;
+  background:#2b2f66;
+  transition:.2s;
+}
+
+.btn-contacto:hover{
+  background:#3b40a0;
+  transform:translateY(-1px);
+}
+
+.btn-contacto img{
+  width:22px;
+  height:22px;
+}
+
+.icono-comunidad{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  object-fit:cover;
+
+  /* Glow neon */
+  box-shadow:
+    0 0 6px rgba(108,99,255,.8),
+    0 0 14px rgba(108,99,255,.6),
+    0 0 22px rgba(108,99,255,.4);
+
+  border:2px solid #6c63ff;
+  background:#000;
+}
+
+
   
 </style>
 </head>
@@ -513,6 +579,31 @@ function toggleCronograma(){
 
 </script>
 
+<div class="contacto-panel">
+
+  <h4>📬 Contacto</h4>
+
+  <div class="contacto-botones">
+
+    <a href="https://wa.me/5492236689580" target="_blank" class="btn-contacto">
+      <img src="icon-whatsapp.png" alt="">
+      Contactar al Profe (WhatsApp)
+    </a>
+
+    <a href="mailto:tuemail@ejemplo.com" class="btn-contacto">
+      <img src="icon-mail.png" alt="">
+      Contactar al Profe (Mail)
+    </a>
+
+    <a href="https://chat.whatsapp.com/XXXXXXXX" target="_blank" class="btn-contacto">
+      <img src="icon-comunidad.png" alt="">
+      Comunidad AyRPC (WhatsApp)
+    </a>
+
+  </div>
+</div>
+
+
 <!-- CRONOGRAMA LATERAL -->
 <div id="cronogramaPanel" class="cronograma-panel">
 
@@ -562,6 +653,7 @@ function toggleCronograma(){
   
 </body>
 </html>
+
 
 
 
