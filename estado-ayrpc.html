@@ -342,6 +342,45 @@ button{
   background:#000;
 }
 
+#btnContacto{
+  width:auto;
+  position:fixed;
+  bottom:72px;            /* arriba del botón Cronograma */
+  right:20px;
+  background:#6c63ff;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:9001;
+  box-shadow:0 0 15px rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+#btnContacto:hover{
+  background:#7c74ff;
+}
+
+#btnContacto img{
+  width:18px;
+  height:18px;
+}
+
+/* panel contacto flotante (arriba del cronograma) */
+.contacto-panel{
+  position:fixed;
+  bottom:120px;           /* queda arriba de Contacto y Cronograma */
+  right:20px;
+  width:320px;
+  margin:0;
+  display:none;           /* arranca cerrado */
+  z-index:9002;
+}
+
 
   
 </style>
@@ -576,32 +615,27 @@ function toggleCronograma(){
   if(btnInside) btnInside.textContent = abierto ? "X" : "X";
 }
 
+function toggleContacto(){
+  const panel = document.getElementById("panelContacto");
+  if(!panel) return;
+  panel.style.display = (panel.style.display === "block") ? "none" : "block";
+}
+
+document.addEventListener("click", (e)=>{
+  const panel = document.getElementById("panelContacto");
+  const btn = document.getElementById("btnContacto");
+  if(!panel || !btn) return;
+
+  const abierto = panel.style.display === "block";
+  if(!abierto) return;
+
+  if(panel.contains(e.target) || btn.contains(e.target)) return;
+  panel.style.display = "none";
+});
+
+
 
 </script>
-
-<div class="contacto-panel">
-
-  <h4>📬 Contacto</h4>
-
-  <div class="contacto-botones">
-
-    <a href="https://wa.me/5492236689580" target="_blank" class="btn-contacto">
-      <img src="icon-whatsapp.png" alt="">
-      Contactar al Profe (WhatsApp)
-    </a>
-
-    <a href="mailto:tuemail@ejemplo.com" class="btn-contacto">
-      <img src="icon-mail.png" alt="">
-      Contactar al Profe (Mail)
-    </a>
-
-    <a href="https://chat.whatsapp.com/XXXXXXXX" target="_blank" class="btn-contacto">
-      <img src="icon-comunidad.png" alt="">
-      Comunidad AyRPC (WhatsApp)
-    </a>
-
-  </div>
-</div>
 
 
 <!-- CRONOGRAMA LATERAL -->
@@ -645,14 +679,41 @@ function toggleCronograma(){
     <div class="clase future last">🦠 24/01/2026 – Virus y Malware (Última)</div>
 
   </div>
-</div>  
+</div>
+
+<button id="btnContacto" onclick="toggleContacto()">
+  <img src="icons/icon-buzon.png" alt="">
+  Contacto
+</button>
 
 <button id="btnAbrirCronograma" onclick="toggleCronograma()">
   📅 Cronograma y temario
 </button>
+
+<div class="contacto-panel">
+  <div class="contacto-botones">
+
+    <a href="https://wa.me/5492236689580" target="_blank" class="btn-contacto">
+      <img src="icons/whatsapp.png" alt="">
+      Contactar al Profe (WhatsApp)
+    </a>
+
+    <a href="mailto:acoria@frba.utn.edu.ar" class="btn-contacto">
+      <img src="icons/mail.png" alt="">
+      Contactar al Profe (Mail)
+    </a>
+
+    <a href="https://chat.whatsapp.com/LczmlYvVzWf2SDStqVMUqW" target="_blank" class="btn-contacto">
+      <img src="icons/comunidad.png" alt="">
+      Comunidad AyRPC (WhatsApp)
+    </a>
+
+  </div>
+</div>
   
 </body>
 </html>
+
 
 
 
