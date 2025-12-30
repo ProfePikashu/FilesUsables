@@ -293,7 +293,7 @@ button{
   padding:12px;
   box-shadow:-6px 0 20px rgba(0,0,0,.5);
   transition:.35s ease;
-  z-index:9998;
+  z-index:10001;
 }
 
 .contacto-panel.open{
@@ -605,11 +605,6 @@ function toggleCronograma(){
 
 function toggleContacto(){
   const panel = document.getElementById("panelContacto");
-  panel.classList.toggle("open");
-}
-
-function toggleContacto(){
-  const panel = document.getElementById("panelContacto");
   const cronograma = document.getElementById("cronogramaPanel");
 
   panel.classList.toggle("open");
@@ -619,14 +614,16 @@ function toggleContacto(){
 document.addEventListener("click", (e)=>{
   const panel = document.getElementById("panelContacto");
   const btn = document.getElementById("btnContacto");
+
   if(!panel || !btn) return;
 
-  const abierto = panel.style.display === "block";
-  if(!abierto) return;
+  if(!panel.classList.contains("open")) return;
 
   if(panel.contains(e.target) || btn.contains(e.target)) return;
-  panel.style.display = "none";
+
+  panel.classList.remove("open");
 });
+
 </script>
 
 
@@ -705,5 +702,6 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
