@@ -352,23 +352,6 @@ button{
 }
 
 /* botón flotante */
-#btnContacto{
-  position:fixed;
-  bottom:72px;
-  right:20px;
-  background:#6c63ff;
-  color:white;
-  border:none;
-  border-radius:12px;
-  padding:10px 14px;
-  font-weight:bold;
-  cursor:pointer;
-  z-index:9999;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  box-shadow:0 0 15px rgba(0,0,0,.4);
-}
 
 #btnAbrirContacto{
   position:fixed;
@@ -383,12 +366,19 @@ button{
   cursor:pointer;
   z-index:9001;
   box-shadow:0 0 15px rgba(0,0,0,.4);
-  transition:.2s;
+  transition:.25s;
 }
 
 #btnAbrirContacto:hover{
   background:#7c74ff;
 }
+
+
+/* Evita que el botón herede width:100% */
+#btnAbrirContacto{
+  width:auto !important;
+}
+
   
 </style>
 </head>
@@ -624,11 +614,18 @@ function toggleCronograma(){
 
 function toggleContacto(){
   const panel = document.getElementById("panelContacto");
+  const btn = document.getElementById("btnAbrirContacto");
   const cronograma = document.getElementById("cronogramaPanel");
 
-  panel.classList.toggle("open");
+  const abierto = panel.classList.toggle("open");
+
+  // ocultar botón cuando está abierto
+  btn.style.display = abierto ? "none" : "flex";
+
+  // cerrar cronograma si estaba abierto
   cronograma.classList.remove("open");
 }
+
 
 document.addEventListener("click", (e)=>{
   const panel = document.getElementById("panelContacto");
@@ -638,8 +635,8 @@ document.addEventListener("click", (e)=>{
   if(panel.contains(e.target) || btn.contains(e.target)) return;
 
   panel.classList.remove("open");
+  btn.style.display = "flex";
 });
-
 
 </script>
 
@@ -719,6 +716,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
