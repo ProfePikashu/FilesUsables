@@ -605,8 +605,15 @@ function toggleCronograma(){
 
 function toggleContacto(){
   const panel = document.getElementById("panelContacto");
-  if(!panel) return;
-  panel.style.display = (panel.style.display === "block") ? "none" : "block";
+  panel.classList.toggle("open");
+}
+
+function toggleContacto(){
+  const panel = document.getElementById("panelContacto");
+  const cronograma = document.getElementById("cronogramaPanel");
+
+  panel.classList.toggle("open");
+  cronograma.classList.remove("open");
 }
 
 document.addEventListener("click", (e)=>{
@@ -698,4 +705,5 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
