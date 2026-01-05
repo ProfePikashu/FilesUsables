@@ -646,6 +646,18 @@ document.addEventListener("click", (e)=>{
   btn.style.display = "flex";
 });
 
+document.addEventListener("click", (e)=>{
+  const panel = document.getElementById("cronogramaPanel");
+  const btn = document.getElementById("btnAbrirCronograma");
+
+  if(!panel.classList.contains("open")) return;
+  if(panel.contains(e.target) || btn.contains(e.target)) return;
+
+  panel.classList.remove("open");
+  btn.style.display = "block";
+});
+
+
 </script>
 
 
@@ -728,6 +740,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
