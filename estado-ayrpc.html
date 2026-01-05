@@ -553,11 +553,11 @@ function procesar(a){
         <td>${c.n}</td>
         <td class="${cls}">${est}</td>
         <td>${tiempo}</td>
-        <td>${i<3?"Evaluada":"Pendiente"}</td>
+        <td>${i < TOTAL_EVALUADAS ? "Evaluada" : "Pendiente"}</td>
       </tr>
     `;
 
-    if(i<3 && (est==="PRESENTE"||est==="RECUPERADA")) ok++;
+    if(i < TOTAL_EVALUADAS && (est==="PRESENTE" || est==="RECUPERADA")) ok++;
 
     if(CFG[c.k]){
       const div=document.createElement("div");
@@ -724,6 +724,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
