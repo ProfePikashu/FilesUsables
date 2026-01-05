@@ -461,7 +461,8 @@ const ORDEN = [
 const CFG={
  "1er":{total:11400,min:8550},
  "2da":{total:6800,min:5100},
- "3er":{total:7600,min:5700}
+ "3er":{total:7600,min:5700},
+ "4ta":{total:7600,min:5700},
 };
 
 const login = document.getElementById("login");
@@ -481,6 +482,8 @@ const graficos = document.getElementById("graficos");
 const kAsistencia = document.getElementById("k-asistencia");
 const kPorcentaje = document.getElementById("k-porcentaje");
 const kEstado = document.getElementById("k-estado");
+
+const TOTAL_EVALUADAS = 4;
 
 document.getElementById("btnBuscar").onclick = cargar;
 btnVolver.onclick = volver;
@@ -563,9 +566,14 @@ function procesar(a){
     }
   });
 
-  kAsistencia.textContent = ok+"/3";
-  kPorcentaje.textContent = Math.round(ok/3*100)+"%";
-  kEstado.textContent = ok===3?"EXCELENTE":ok===2?"DEBE 1 CLASE":"RIESGO";
+  kAsistencia.textContent = ok + "/" + TOTAL_EVALUADAS;
+kPorcentaje.textContent = Math.round(ok / TOTAL_EVALUADAS * 100) + "%";
+
+kEstado.textContent =
+  ok === TOTAL_EVALUADAS ? "EXCELENTE" :
+  ok === TOTAL_EVALUADAS - 1 ? "DEBE 1 CLASE" :
+  ok === TOTAL_EVALUADAS - 2 ? "DEBE 2 CLASES" :
+  "RIESGO";
 }
 
 function parseT(t){
@@ -716,6 +724,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
