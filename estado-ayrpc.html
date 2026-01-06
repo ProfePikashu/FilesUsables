@@ -634,27 +634,36 @@ function toggleContacto(){
   cronograma.classList.remove("open");
 }
 
-
 document.addEventListener("click", (e)=>{
-  const panel = document.getElementById("panelContacto");
-  const btn = document.getElementById("btnAbrirContacto");
+  const cronograma = document.getElementById("cronogramaPanel");
+  const btnCrono = document.getElementById("btnAbrirCronograma");
 
-  if(!panel.classList.contains("open")) return;
-  if(panel.contains(e.target) || btn.contains(e.target)) return;
+  const contacto = document.getElementById("panelContacto");
+  const btnContacto = document.getElementById("btnAbrirContacto");
 
-  panel.classList.remove("open");
-  btn.style.display = "flex";
-});
+  // si clickea dentro de cronograma o su botón → no cerrar
+  if (
+    cronograma.classList.contains("open") &&
+    (cronograma.contains(e.target) || btnCrono.contains(e.target))
+  ) return;
 
-document.addEventListener("click", (e)=>{
-  const panel = document.getElementById("cronogramaPanel");
-  const btn = document.getElementById("btnAbrirCronograma");
+  // si clickea dentro de contacto o su botón → no cerrar
+  if (
+    contacto.classList.contains("open") &&
+    (contacto.contains(e.target) || btnContacto.contains(e.target))
+  ) return;
 
-  if(!panel.classList.contains("open")) return;
-  if(panel.contains(e.target) || btn.contains(e.target)) return;
+  // cerrar cronograma
+  if(cronograma.classList.contains("open")){
+    cronograma.classList.remove("open");
+    btnCrono.style.display = "block";
+  }
 
-  panel.classList.remove("open");
-  btn.style.display = "block";
+  // cerrar contacto
+  if(contacto.classList.contains("open")){
+    contacto.classList.remove("open");
+    btnContacto.style.display = "flex";
+  }
 });
 
 
@@ -740,6 +749,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
