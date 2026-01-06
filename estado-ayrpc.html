@@ -362,6 +362,28 @@ button{
   width:auto !important;
 }
 
+  #btnAbrirDrive{
+  position:fixed;
+  bottom:124px;           /* arriba de Contacto */
+  right:20px;
+  background:#3cff8f;
+  color:#002b18;
+  border:none;
+  border-radius:12px;
+  padding:10px 14px;
+  font-weight:800;
+  cursor:pointer;
+  z-index:9002;
+  box-shadow:0 0 15px rgba(60,255,143,.4);
+  transition:.25s;
+  width:auto;
+}
+
+#btnAbrirDrive:hover{
+  background:#5dffad;
+}
+
+
   
 </style>
 </head>
@@ -679,7 +701,10 @@ document.addEventListener("click", (e)=>{
 
   </div>
 </div>
-
+  
+<button id="btnAbrirDrive" onclick="window.open('https://drive.google.com/drive/folders/1VoQvgIo4D3GujyE9xey7KyTD8M8Tu-my?usp=drive_link')">
+  📁 Materiales del curso
+</button>
 
 <button id="btnAbrirCronograma" onclick="toggleCronograma()">
   📅 Cronograma y temario
@@ -713,6 +738,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
