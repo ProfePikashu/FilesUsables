@@ -609,29 +609,23 @@ function volver(){
 
 function toggleCronograma(){
   const panel = document.getElementById("cronogramaPanel");
-  const btnFloating = document.getElementById("btnAbrirCronograma");
-  const btnInside = document.getElementById("btnCronograma");
+  const contacto = document.getElementById("panelContacto");
+
+  // cerrar contacto si está abierto
+  contacto.classList.remove("open");
 
   panel.classList.toggle("open");
-
-  const abierto = panel.classList.contains("open");
-
-  if(btnFloating) btnFloating.style.display = abierto ? "none" : "block";
-  if(btnInside) btnInside.textContent = abierto ? "X" : "X";
 }
+
 
 function toggleContacto(){
   const panel = document.getElementById("panelContacto");
-  const btn = document.getElementById("btnAbrirContacto");
   const cronograma = document.getElementById("cronogramaPanel");
 
-  const abierto = panel.classList.toggle("open");
-
-  // ocultar botón cuando está abierto
-  btn.style.display = abierto ? "none" : "flex";
-
-  // cerrar cronograma si estaba abierto
+  // cerrar cronograma si está abierto
   cronograma.classList.remove("open");
+
+  panel.classList.toggle("open");
 }
 
 document.addEventListener("click", (e)=>{
@@ -641,30 +635,22 @@ document.addEventListener("click", (e)=>{
   const contacto = document.getElementById("panelContacto");
   const btnContacto = document.getElementById("btnAbrirContacto");
 
-  // si clickea dentro de cronograma o su botón → no cerrar
+  // click dentro de cronograma o su botón
   if (
     cronograma.classList.contains("open") &&
     (cronograma.contains(e.target) || btnCrono.contains(e.target))
   ) return;
 
-  // si clickea dentro de contacto o su botón → no cerrar
+  // click dentro de contacto o su botón
   if (
     contacto.classList.contains("open") &&
     (contacto.contains(e.target) || btnContacto.contains(e.target))
   ) return;
 
-  // cerrar cronograma
-  if(cronograma.classList.contains("open")){
-    cronograma.classList.remove("open");
-    btnCrono.style.display = "block";
-  }
-
-  // cerrar contacto
-  if(contacto.classList.contains("open")){
-    contacto.classList.remove("open");
-    btnContacto.style.display = "flex";
-  }
+  cronograma.classList.remove("open");
+  contacto.classList.remove("open");
 });
+
 
 
 </script>
@@ -749,6 +735,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
