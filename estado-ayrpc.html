@@ -138,24 +138,26 @@ button{
 /* ============================
    CRONOGRAMA LATERAL
 ============================ */
-
 .cronograma-panel{
-  position:fixed;
-  top:80px;
-  right:-320px;   /* 👈 ESTO FALTABA */
-  width:320px;
-  height:auto;
-  background:linear-gradient(180deg,#1a1f4d,#0c1028);
-  border-left:2px solid #6c63ff;
-  border-radius:12px 0 0 12px;
-  box-shadow:-6px 0 20px rgba(0,0,0,.5);
-  transition:.4s;
-  z-index:9999;
-  overflow:hidden;
+  position: fixed;
+  top: 80px;
+
+  right: -320px;   /* oculto a la derecha */
+  left: auto;      /* 🚨 CLAVE: anula el left implícito */
+
+  width: 320px;
+  height: auto;
+  background: linear-gradient(180deg,#1a1f4d,#0c1028);
+  border-left: 2px solid #6c63ff;
+  border-radius: 12px 0 0 12px;
+  box-shadow: -6px 0 20px rgba(0,0,0,.5);
+  transition: right .4s ease;
+  z-index: 9999;
+  overflow: hidden;
 }
 
 .cronograma-panel.open{
-  right:0;        /* 👈 entra desde la derecha */
+  right: 0;
 }
 
 
@@ -739,6 +741,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
