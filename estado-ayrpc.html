@@ -142,6 +142,7 @@ button{
 .cronograma-panel{
   position:fixed;
   top:80px;
+  right:-320px;   /* 👈 ESTO FALTABA */
   width:320px;
   height:auto;
   background:linear-gradient(180deg,#1a1f4d,#0c1028);
@@ -154,8 +155,9 @@ button{
 }
 
 .cronograma-panel.open{
-  right:0;
+  right:0;        /* 👈 entra desde la derecha */
 }
+
 
 .cronograma-header{
   background:linear-gradient(90deg,#6c63ff,#8b5cf6);
@@ -737,6 +739,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
