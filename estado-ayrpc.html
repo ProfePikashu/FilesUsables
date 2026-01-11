@@ -642,14 +642,15 @@ function grafico(el, c, t){
     plot_bgcolor: "transparent",
     showlegend: false
   }, { displayModeBar: false });
+
+  const label = document.createElement("div");
+  label.style.textAlign = "center";
+  label.style.marginTop = "6px";
+  label.style.color = "#9fa8ff";
+  label.style.fontWeight = "600";
+  label.textContent = c.n;
+  el.appendChild(label);
 }
-const label = document.createElement("div");
-label.style.textAlign = "center";
-label.style.marginTop = "6px";
-label.style.color = "#9fa8ff";
-label.style.fontWeight = "600";
-label.textContent = c.n;
-el.appendChild(label);
 
 
 function volver(){
@@ -789,6 +790,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
