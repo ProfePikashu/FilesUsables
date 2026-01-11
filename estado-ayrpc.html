@@ -115,8 +115,8 @@ button{
 
 .graficos{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:18px;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:20px;
   justify-items:center;
 }
 
@@ -622,19 +622,20 @@ function grafico(el, c, t){
       colors: [color, "#1a1f4d"]
     }
   }], {
-    title: {
-      text: c.n,
-      font: { color: "#fff", size: 14 }
-    },
+    title: null,
+
     annotations: [{
       text: porcentaje + "%",
       font: {
-        size: 20,
+        size: 22,
         color: color,
         weight: "bold"
       },
-      showarrow: false
+      showarrow: false,
+      x: 0.5,
+      y: 0.5
     }],
+
     height: 180,
     margin: { t: 30, b: 10, l: 10, r: 10 },
     paper_bgcolor: "transparent",
@@ -642,6 +643,13 @@ function grafico(el, c, t){
     showlegend: false
   }, { displayModeBar: false });
 }
+const label = document.createElement("div");
+label.style.textAlign = "center";
+label.style.marginTop = "6px";
+label.style.color = "#9fa8ff";
+label.style.fontWeight = "600";
+label.textContent = c.n;
+el.appendChild(label);
 
 
 function volver(){
@@ -670,6 +678,7 @@ function toggleContacto(){
 
   panel.classList.toggle("open");
 }
+
 
 document.addEventListener("click", (e)=>{
   const cronograma = document.getElementById("cronogramaPanel");
@@ -780,6 +789,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
