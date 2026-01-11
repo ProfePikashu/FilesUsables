@@ -115,17 +115,22 @@ button{
 
 .graficos{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:20px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:24px;
   justify-items:center;
+  align-items:start;
 }
 
 .graficos > div{
   background:#0d1230;
   border:1px solid #6c63ff;
   border-radius:12px;
-  padding:10px;
-  box-shadow:0 0 12px rgba(108,99,255,.3);
+  padding:12px 10px 8px;
+  box-shadow:0 0 14px rgba(108,99,255,.35);
+  min-height:210px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
 }
 
 
@@ -636,8 +641,8 @@ function grafico(el, c, t){
       y: 0.5
     }],
 
-    height: 180,
-    margin: { t: 30, b: 10, l: 10, r: 10 },
+    height: 200,
+    margin: { t: 20, b: 10, l: 10, r: 10 },
     paper_bgcolor: "transparent",
     plot_bgcolor: "transparent",
     showlegend: false
@@ -790,6 +795,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
