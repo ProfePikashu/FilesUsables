@@ -115,9 +115,19 @@ button{
 
 .graficos{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:24px;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:18px;
+  justify-items:center;
 }
+
+.graficos > div{
+  background:#0d1230;
+  border:1px solid #6c63ff;
+  border-radius:12px;
+  padding:10px;
+  box-shadow:0 0 12px rgba(108,99,255,.3);
+}
+
 
 #debug{
   margin-top:10px;
@@ -593,22 +603,46 @@ function parseT(t){
   return (h?+h[1]:0)*3600+(m?+m[1]:0)*60+(s?+s[1]:0);
 }
 
-function grafico(el,c,t){
-  const seg=parseT(t);
-  Plotly.newPlot(el,[{
-    type:"bar",
-    orientation:"h",
-    x:[Math.round(seg/60)],
-    y:[""],
-    marker:{color:seg>=CFG[c.k].min?"#3cff8f":"#ff4c4c"}
-  }],{
-    xaxis:{range:[0,Math.round(CFG[c.k].total/60)]},
-    height:120,
-    margin:{l:20,r:20,t:30,b:20},
-    paper_bgcolor:"transparent",
-    plot_bgcolor:"transparent"
-  },{displayModeBar:false});
+function grafico(el, c, t){
+  const seg = parseT(t);
+  const total = CFG[c.k].total;
+  const min = CFG[c.k].min;
+
+  const porcentaje = Math.round(seg / total * 100);
+
+  const color = seg >= min ? "#3cff8f" : "#ff4c4c";
+
+  Plotly.newPlot(el, [{
+    type: "pie",
+    hole: .7,
+    values: [seg, Math.max(total - seg, 0)],
+    labels: ["Asistencia", "Faltante"],
+    textinfo: "none",
+    marker: {
+      colors: [color, "#1a1f4d"]
+    }
+  }], {
+    title: {
+      text: c.n,
+      font: { color: "#fff", size: 14 }
+    },
+    annotations: [{
+      text: porcentaje + "%",
+      font: {
+        size: 20,
+        color: color,
+        weight: "bold"
+      },
+      showarrow: false
+    }],
+    height: 180,
+    margin: { t: 30, b: 10, l: 10, r: 10 },
+    paper_bgcolor: "transparent",
+    plot_bgcolor: "transparent",
+    showlegend: false
+  }, { displayModeBar: false });
 }
+
 
 function volver(){
   contenido.style.display="none";
@@ -746,6 +780,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
