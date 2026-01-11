@@ -125,13 +125,27 @@ button{
   background:#0d1230;
   border:1px solid #6c63ff;
   border-radius:12px;
-  padding:12px 10px 8px;
+  padding:12px 10px 10px;
   box-shadow:0 0 14px rgba(108,99,255,.35);
-  min-height:210px;
   display:flex;
   flex-direction:column;
-  justify-content:center;
+  align-items:center;
+  justify-content:flex-start; /* no lo centres verticalmente */
+  gap:8px;
 }
+
+.plotWrap{
+  width: 220px;      /* tamaño de la dona */
+  height: 220px;     /* círculo real */
+}
+
+.plotLabel{
+  text-align:center;
+  color:#9fa8ff;
+  font-weight:600;
+  font-size:13px;
+}
+
 
 
 #debug{
@@ -613,48 +627,47 @@ function grafico(el, c, t){
   const total = CFG[c.k].total;
   const min = CFG[c.k].min;
 
-  const porcentaje = Math.round(seg / total * 100);
-
+  const porcentaje = Math.max(0, Math.min(100, Math.round((seg / total) * 100)));
   const color = seg >= min ? "#3cff8f" : "#ff4c4c";
 
-  Plotly.newPlot(el, [{
+  // limpiá el contenedor (por si recargás)
+  el.innerHTML = "";
+
+  // contenedor exclusivo para Plotly
+  const plotWrap = document.createElement("div");
+  plotWrap.className = "plotWrap";
+  el.appendChild(plotWrap);
+
+  Plotly.newPlot(plotWrap, [{
     type: "pie",
-    hole: .7,
+    hole: 0.72,
     values: [seg, Math.max(total - seg, 0)],
-    labels: ["Asistencia", "Faltante"],
     textinfo: "none",
-    marker: {
-      colors: [color, "#1a1f4d"]
-    }
+    marker: { colors: [color, "#1a1f4d"] },
+    sort: false,
+    direction: "clockwise",
+    hoverinfo: "skip"
   }], {
-    title: null,
-
-    annotations: [{
-      text: porcentaje + "%",
-      font: {
-        size: 22,
-        color: color,
-        weight: "bold"
-      },
-      showarrow: false,
-      x: 0.5,
-      y: 0.5
-    }],
-
-    height: 200,
-    margin: { t: 20, b: 10, l: 10, r: 10 },
+    margin: { t: 0, b: 0, l: 0, r: 0 },
     paper_bgcolor: "transparent",
     plot_bgcolor: "transparent",
-    showlegend: false
-  }, { displayModeBar: false });
+    showlegend: false,
+    annotations: [{
+      text: porcentaje + "%",
+      showarrow: false,
+      x: 0.5,
+      y: 0.5,
+      font: { size: 22, color: color }
+    }]
+  }, { displayModeBar: false, responsive: true });
 
   const label = document.createElement("div");
-  label.style.textAlign = "center";
-  label.style.marginTop = "6px";
-  label.style.color = "#9fa8ff";
-  label.style.fontWeight = "600";
+  label.className = "plotLabel";
   label.textContent = c.n;
   el.appendChild(label);
+
+  // forzá resize por si el navegador se hace el vivo
+  setTimeout(()=>{ Plotly.Plots.resize(plotWrap); }, 0);
 }
 
 
@@ -795,6 +808,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
