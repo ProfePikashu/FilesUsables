@@ -471,6 +471,7 @@ const CFG={
  "2da":{total:6800,min:5100},
  "3er":{total:7600,min:5700},
  "4ta":{total:7600,min:5700},
+ "5ta":{total:10080,min:7560},
 };
 
 const login = document.getElementById("login");
@@ -491,7 +492,7 @@ const kAsistencia = document.getElementById("k-asistencia");
 const kPorcentaje = document.getElementById("k-porcentaje");
 const kEstado = document.getElementById("k-estado");
 
-const TOTAL_EVALUADAS = 4;
+const TOTAL_EVALUADAS = 5;
 
 document.getElementById("btnBuscar").onclick = cargar;
 btnVolver.onclick = volver;
@@ -694,11 +695,15 @@ document.addEventListener("click", (e)=>{
       <a href="https://www.twitch.tv/videos/2661787837" target="_blank" class="btn-ver">Ver grabación</a>
     </div>
 
+    <div class="clase done">
+      <span>🧷 10/01/2026 – Introduccion a <br> las Microsoldaduras</span>
+      <a href="https://www.twitch.tv/videos/2666910431" target="_blank" class="btn-ver">Ver grabación</a>
+    </div>
+
     <hr>
 
     <h4>Clases restantes</h4>
 
-    <div class="clase future">🧷 10/01/2026 – Microsoldaduras</div>
     <div class="clase future">🧯 17/01/2026 – Solución de Problemas</div>
     <div class="clase future last">🦠 24/01/2026 – Virus y Malware (Última)</div>
 
@@ -741,6 +746,7 @@ document.addEventListener("click", (e)=>{
   
 </body>
 </html>
+
 
 
 
