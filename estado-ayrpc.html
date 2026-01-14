@@ -807,19 +807,29 @@ document.addEventListener("click", (e)=>{
   contacto.classList.remove("open");
 });
 
-const faqBtn = document.getElementById("btnFaq");
-const faqPanel = document.getElementById("faqPanel");
-const closeFaq = document.getElementById("closeFaq");
+document.addEventListener("DOMContentLoaded", () => {
 
-faqBtn.onclick = () => faqPanel.classList.add("active");
-closeFaq.onclick = () => faqPanel.classList.remove("active");
+  const faqBtn = document.getElementById("btnFaq");
+  const faqPanel = document.getElementById("faqPanel");
+  const closeFaq = document.getElementById("closeFaq");
 
-document.querySelectorAll(".faq-question").forEach(btn=>{
-  btn.onclick = () => {
-    const ans = btn.nextElementSibling;
-    ans.style.display = ans.style.display === "block" ? "none" : "block";
+  if(!faqBtn || !faqPanel || !closeFaq){
+    console.log("FAQ no encontrado en el DOM");
+    return;
   }
+
+  faqBtn.onclick = () => faqPanel.classList.add("active");
+  closeFaq.onclick = () => faqPanel.classList.remove("active");
+
+  document.querySelectorAll(".faq-question").forEach(btn=>{
+    btn.onclick = () => {
+      const ans = btn.nextElementSibling;
+      ans.style.display = ans.style.display === "block" ? "none" : "block";
+    };
+  });
+
 });
+
 
 
 </script>
@@ -945,6 +955,7 @@ document.querySelectorAll(".faq-question").forEach(btn=>{
   
 </body>
 </html>
+
 
 
 
