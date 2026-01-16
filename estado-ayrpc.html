@@ -661,6 +661,15 @@ async function cargar(){
     const r = await fetch(API + "?dni=" + encodeURIComponent(dni));
     const data = await r.json();
 
+    // 👉 ALUMNO DADO DE BAJA
+  if(data.estado === "BAJA"){
+    document.getElementById("loadingBox").style.display = "none";
+    document.getElementById("errorBox").style.display = "block";
+    document.getElementById("errorBox").innerHTML = "⛔ ALUMNO DADO DE BAJA<br>Este alumno ya no forma parte del curso.";
+    return;
+  }
+
+
     document.getElementById("loadingBox").style.display = "none";
 
     // 👉 SI NO EXISTE EL DNI
@@ -1114,6 +1123,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
