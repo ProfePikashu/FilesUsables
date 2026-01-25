@@ -787,11 +787,16 @@ function procesar(a){
   kAsistencia.textContent = ok + "/" + TOTAL_EVALUADAS;
 kPorcentaje.textContent = Math.round(ok / TOTAL_EVALUADAS * 100) + "%";
 
+const debe = TOTAL_EVALUADAS - ok;
+
 kEstado.textContent =
-  ok === TOTAL_EVALUADAS ? "EXCELENTE" :
-  ok === TOTAL_EVALUADAS - 1 ? "DEBE 1 CLASE" :
-  ok === TOTAL_EVALUADAS - 2 ? "DEBE 2 CLASES" :
-  "RIESGO";
+  debe === 0 ? "EXCELENTE" :
+  debe === 1 ? "DEBE 1 CLASE" :
+  "DEBE " + debe + " CLASES";
+
+kEstado.className =
+  debe === 0 ? "estado-ok" : "estado-bad";
+
 }
 
 function parseT(t){
@@ -1181,6 +1186,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
