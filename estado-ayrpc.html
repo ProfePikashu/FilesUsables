@@ -533,6 +533,40 @@ button{
   }
 
 }
+
+  .apto-box{
+  background:linear-gradient(135deg,#1a1f4d,#0d1230);
+  border:2px solid var(--neon);
+  border-radius:16px;
+  padding:24px 16px;
+  text-align:center;
+  margin-bottom:16px;
+  box-shadow:0 0 25px rgba(108,99,255,.45);
+}
+
+.apto-titulo{
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:#9fa8ff;
+}
+
+.apto-valor{
+  font-size:42px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.apto-si{
+  color:var(--ok);
+  text-shadow:0 0 12px rgba(60,255,143,.8);
+}
+
+.apto-no{
+  color:var(--bad);
+  text-shadow:0 0 12px rgba(255,76,76,.8);
+}
+
 </style>
 </head>
 
@@ -563,6 +597,14 @@ button{
 </div>
 
 <div id="contenido" style="display:none">
+
+<div class="card">
+  <div class="apto-box">
+    <div class="apto-titulo">APTO EXAMEN</div>
+    <div id="aptoValor" class="apto-valor">-</div>
+  </div>
+</div>
+
 
 <div class="card">
   <h2 id="nombre"></h2>
@@ -638,6 +680,8 @@ const graficos = document.getElementById("graficos");
 const kAsistencia = document.getElementById("k-asistencia");
 const kPorcentaje = document.getElementById("k-porcentaje");
 const kEstado = document.getElementById("k-estado");
+const aptoValor = document.getElementById("aptoValor");
+
 
 const TOTAL_EVALUADAS = 7;
   
@@ -699,6 +743,12 @@ function procesar(a){
   dTelefono.textContent = a["Teléfono (con Código de Área)"];
   dTwitch.textContent = a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
   dObs.textContent = a["Observaciones"];
+
+  const apto = (a["APTO"] || "").toUpperCase();
+
+  aptoValor.textContent = apto || "-";
+  aptoValor.className = "apto-valor " + (apto === "SI" ? "apto-si" : "apto-no");
+
 
   tablaClases.innerHTML="";
   graficos.innerHTML="";
@@ -1128,3 +1178,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
