@@ -682,8 +682,6 @@ const kPorcentaje = document.getElementById("k-porcentaje");
 const kEstado = document.getElementById("k-estado");
 const aptoValor = document.getElementById("aptoValor");
 
-console.log("APTO RECIBIDO:", a["APTO"]);
-
 
 const TOTAL_EVALUADAS = 7;
   
@@ -750,6 +748,9 @@ function procesar(a){
 
   aptoValor.textContent = apto || "-";
   aptoValor.className = "apto-valor " + (apto === "SI" ? "apto-si" : "apto-no");
+
+  console.log("APTO RECIBIDO:", a["APTO"]);
+
 
 
   tablaClases.innerHTML="";
@@ -1180,5 +1181,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
