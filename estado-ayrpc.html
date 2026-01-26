@@ -362,11 +362,20 @@ button{
 /* texto oculto */
 .contacto-texto{
   white-space:nowrap;
-  transform:translateX(-10px);
   transition:.25s;
   font-weight:600;
   color:#fff;
 }
+
+.contacto-item:hover img{
+  transform:scale(1.15);
+}
+
+.contacto-item:hover .contacto-texto{
+  transform:scale(1.08);
+}
+
+
 
 /* aparece al hover */
 .contacto-item:hover .contacto-texto{
@@ -1187,6 +1196,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
