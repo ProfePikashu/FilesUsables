@@ -512,32 +512,44 @@ button{
 
 @media (max-width: 488px){
 
+  body{
+    padding-bottom:220px; /* espacio para los botones */
+  }
+
+  /* Apagar flotado */
   #btnAbrirDrive,
   #btnAbrirContacto,
   #btnAbrirCronograma,
   .faq-btn{
-    max-width:90%;
-    width:auto;
+    position:static !important;
+    width:90%;
+    max-width:320px;
   }
+
+  /* Contenedor inferior */
+  .mobile-actions{
+    position:fixed;
+    bottom:20px;
+    left:0;
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    z-index:9999;
+  }
+  
+  .mobile-actions button{
+  animation:fadeUp .4s ease both;
+  }
+
+  @keyframes fadeUp{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
 }
 
-  #btnAbrirDrive{
-    bottom:160px;
-  }
-
-  #btnAbrirContacto{
-    bottom:120px;
-  }
-
-  #btnAbrirCronograma{
-    bottom:80px;
-  }
-
-  .faq-btn{
-    bottom:36px;
-  }
-
-}
 
 
   .apto-box{
@@ -1190,18 +1202,25 @@ document.addEventListener("DOMContentLoaded", () => {
   </div>
 </div>
 
+<script>
+if(window.innerWidth <= 488){
+  const box = document.createElement("div");
+  box.className = "mobile-actions";
+
+  [
+    "btnAbrirDrive",
+    "btnAbrirContacto",
+    "btnAbrirCronograma",
+    "btnFaq"
+  ].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) box.appendChild(el);
+  });
+
+  document.body.appendChild(box);
+}
+</script>
+
+
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
