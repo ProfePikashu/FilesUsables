@@ -588,6 +588,41 @@ button{
   text-shadow:0 0 12px rgba(255,76,76,.8);
 }
 
+  /* ============================
+   MEME ANSIOSOS (BOTÓN + SPINNER)
+============================ */
+.btn-meme{
+  width:auto;
+  padding:10px 16px;
+  border-radius:12px;
+  border:none;
+  font-size:14px;
+  font-weight:900;
+  cursor:pointer;
+  background:linear-gradient(90deg,#ff0080,#6c63ff);
+  color:#fff;
+  box-shadow:0 0 14px rgba(255,0,128,.35);
+}
+
+.btn-meme:hover{
+  filter:brightness(1.08);
+  transform:scale(1.02);
+}
+
+.spinner-meme{
+  width:44px;
+  height:44px;
+  border:6px solid rgba(255,255,255,.18);
+  border-top:6px solid #ff0080;
+  border-radius:50%;
+  margin:auto;
+  animation: spinMeme 1s linear infinite;
+}
+
+@keyframes spinMeme{
+  to{ transform: rotate(360deg); }
+}
+
 </style>
 </head>
 
@@ -623,6 +658,32 @@ button{
   <div class="apto-box">
     <div class="apto-titulo">APTO EXAMEN</div>
     <div id="aptoValor" class="apto-valor">-</div>
+  </div>
+</div>
+
+  <div class="card">
+  <div class="apto-box">
+    <div class="apto-titulo">APTO EXAMEN</div>
+    <div id="aptoValor" class="apto-valor">-</div>
+
+    <!-- 👇 BOTÓN MEME ANSIOSOS (DEBAJO DEL APTO) -->
+    <div id="estadoCorreccionContainer" style="margin-top:14px; text-align:center;">
+      <button id="btnEstadoCorreccion" class="btn-meme">
+        Ver estado de corrección
+      </button>
+
+      <div id="loaderAreaMeme" style="display:none; margin-top:14px;">
+        <div class="spinner-meme"></div>
+        <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
+      </div>
+
+      <div id="videoTrollMeme" style="display:none; margin-top:14px;">
+        <video id="memeVideo" width="420" controls playsinline>
+          <source src="meme.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+    <!-- 👆 FIN BOTÓN MEME -->
   </div>
 </div>
 
@@ -818,6 +879,8 @@ kEstado.textContent =
 kEstado.className =
   debe === 0 ? "estado-ok" : "estado-bad";
 
+  initMemeAnsiosos();
+
 }
 
 function parseT(t){
@@ -951,6 +1014,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+  // ============================
+// MEME ANSIOSOS - Botón corrección
+// ============================
+function initMemeAnsiosos(){
+  const btn = document.getElementById("btnEstadoCorreccion");
+  const loader = document.getElementById("loaderAreaMeme");
+  const texto = document.getElementById("estadoTextoMeme");
+  const videoWrap = document.getElementById("videoTrollMeme");
+  const video = document.getElementById("memeVideo");
+
+  if(!btn || !loader || !texto || !videoWrap || !video) return;
+
+  btn.addEventListener("click", ()=>{
+
+    // reset por si lo apretan 2 veces (ansiosos)
+    video.pause();
+    video.currentTime = 0;
+    videoWrap.style.display = "none";
+
+    btn.style.display = "none";
+    loader.style.display = "block";
+
+    setTimeout(() => { texto.innerText = "Analizando..."; }, 400);
+    setTimeout(() => { texto.innerText = "Detectando niveles de ansiedad..."; }, 2100);
+    setTimeout(() => { texto.innerText = "INFORMACIÓN ENCONTRADA"; }, 3900);
+
+    setTimeout(() => {
+      loader.style.display = "none";
+      videoWrap.style.display = "block";
+
+      // autoplay suele fallar si hay sonido, pero probamos igual
+      const p = video.play();
+      if(p && typeof p.catch === "function"){
+        p.catch(()=> {
+          // si Chrome bloquea autoplay, queda visible con controles
+        });
+      }
+    }, 5200);
+  });
+}
 
 
 </script>
