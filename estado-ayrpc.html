@@ -832,8 +832,13 @@ function procesar(a){
 
   aptoValor.textContent = apto || "-";
   aptoValor.className = "apto-valor " + (apto === "SI" ? "apto-si" : "apto-no");
+  
+  const contMeme = document.getElementById("estadoCorreccionContainer");
+  if (contMeme) {
+    contMeme.style.display = (apto === "SI") ? "block" : "none";
+  }
 
-  console.log("APTO RECIBIDO:", a["APTO"]);
+console.log("APTO RECIBIDO:", a["APTO"]);
 
 
 
@@ -1353,6 +1358,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
