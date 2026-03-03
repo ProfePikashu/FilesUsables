@@ -1056,14 +1056,12 @@ btn.onclick = async () => {
   loader.style.display = "block";
   videoWrap.style.display = "none";
 
-  // pedir fullscreen en el click
   try{
     if(video.requestFullscreen) await video.requestFullscreen();
     else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
     else if(video.msRequestFullscreen) video.msRequestFullscreen();
   }catch(e){}
 
-  // preparar audio (en el click)
   video.muted = false;
   video.volume = 1;
 
@@ -1078,6 +1076,7 @@ btn.onclick = async () => {
     video.play().catch(()=>{});
   }, 5200);
 };
+} 
 
 
 </script>
@@ -1354,6 +1353,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
