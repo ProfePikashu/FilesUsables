@@ -1038,6 +1038,15 @@ function initMemeAnsiosos(){
       videoWrap.style.display = "block";
 
       const p = video.play();
+
+      if(video.requestFullscreen){
+        video.requestFullscreen();
+      }else if(video.webkitRequestFullscreen){
+        video.webkitRequestFullscreen();
+      }else if(video.msRequestFullscreen){
+      video.msRequestFullscreen();
+      }
+
       if(p && typeof p.catch === "function"){
         p.catch(()=>{});
       }
@@ -1321,6 +1330,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
