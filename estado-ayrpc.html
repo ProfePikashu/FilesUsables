@@ -1019,7 +1019,7 @@ function initMemeAnsiosos(){
 
   if(!btn || !loader || !texto || !videoWrap || !video) return;
 
-  btn.onclick = ()=>{
+  btn.onclick = () => {
 
     // reset por si lo apretan 2 veces (ansiosos)
     video.pause();
@@ -1037,15 +1037,13 @@ function initMemeAnsiosos(){
       loader.style.display = "none";
       videoWrap.style.display = "block";
 
-      // autoplay suele fallar si hay sonido, pero probamos igual
       const p = video.play();
       if(p && typeof p.catch === "function"){
-        p.catch(()=> {
-          // si Chrome bloquea autoplay, queda visible con controles
-        });
+        p.catch(()=>{});
       }
     }, 5200);
-  });
+
+  };
 }
 
 
@@ -1323,6 +1321,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
