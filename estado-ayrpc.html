@@ -623,6 +623,12 @@ button{
   to{ transform: rotate(360deg); }
 }
 
+#videoTrollMeme video{
+  width:100%;
+  max-width:720px;
+  border-radius:12px;
+}
+
 </style>
 </head>
 
@@ -670,10 +676,9 @@ button{
         <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
       </div>
 
-      <div id="videoTrollMeme" style="display:none; margin-top:14px;">
-        <video id="memeVideo" width="420" controls playsinline>
-          <source src="media/meme.mp4" type="video/mp4">
-        </video>
+      <video id="memeVideo" playsinline autoplay loop muted>
+        <source src="media/meme.mp4" type="video/mp4">
+      </video>
       </div>
     </div>
     <!-- 👆 FIN BOTÓN MEME -->
@@ -1037,6 +1042,18 @@ function initMemeAnsiosos(){
       loader.style.display = "none";
       videoWrap.style.display = "block";
 
+      // anti pausa: si lo pausan, sigue
+      video.addEventListener("pause", () => {
+      video.play().catch(()=>{});
+      });
+
+// anti click pausa (en algunos browsers click pausa)
+video.addEventListener("click", (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  video.play().catch(()=>{});
+});
+
       const p = video.play();
 
       if(video.requestFullscreen){
@@ -1330,6 +1347,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
