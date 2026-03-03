@@ -1047,48 +1047,32 @@ function initMemeAnsiosos(){
     forcePlay();
   });
 
-  btn.onclick = () => {
-    // reset
-    video.pause();
+btn.onclick = async () => {
+  // oculto el botón y muestro loader
+  btn.style.display = "none";
+  loader.style.display = "block";
+  videoWrap.style.display = "none";
+
+  // 🔥 FULLSCREEN DENTRO DEL CLICK (así no lo bloquea)
+  try{
+    if(video.requestFullscreen) await video.requestFullscreen();
+    else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+    else if(video.msRequestFullscreen) video.msRequestFullscreen();
+  }catch(e){ /* si falla, no pasa nada */ }
+
+  // show del texto
+  setTimeout(() => { texto.innerText = "Analizando..."; }, 400);
+  setTimeout(() => { texto.innerText = "Detectando niveles de ansiedad..."; }, 2100);
+  setTimeout(() => { texto.innerText = "INFORMACIÓN ENCONTRADA"; }, 3900);
+
+  // arrancar video
+  setTimeout(() => {
+    loader.style.display = "none";
+    videoWrap.style.display = "block";
     video.currentTime = 0;
-    videoWrap.style.display = "none";
-
-    btn.style.display = "none";
-    loader.style.display = "block";
-
-    setTimeout(() => { texto.innerText = "Analizando..."; }, 400);
-    setTimeout(() => { texto.innerText = "Detectando niveles de ansiedad..."; }, 2100);
-    setTimeout(() => { texto.innerText = "INFORMACIÓN ENCONTRADA"; }, 3900);
-
-    setTimeout(() => {
-      loader.style.display = "none";
-      videoWrap.style.display = "block";
-
-      // Arranca
-      forcePlay();
-
-      // Fullscreen: SOLO funciona si el navegador lo considera “gesto del usuario”.
-      // Como esto corre 5.2s después, puede que Chrome lo bloquee.
-      const tryFs = () => {
-        if (document.fullscreenElement) return;
-        if (video.requestFullscreen) video.requestFullscreen().catch(()=>{});
-        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
-        else if (video.msRequestFullscreen) video.msRequestFullscreen();
-      };
-
-      // Intento 1 (puede fallar)
-      tryFs();
-
-      // Si falló, que el primer click dentro del video lo mande a fullscreen
-      const fsOnFirstTap = () => {
-        tryFs();
-        video.removeEventListener("click", fsOnFirstTap, true);
-      };
-      video.addEventListener("click", fsOnFirstTap, true);
-
-    }, 5200);
-  };
-}
+    video.play().catch(()=>{});
+  }, 5200);
+};
 
 
 </script>
@@ -1365,6 +1349,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
