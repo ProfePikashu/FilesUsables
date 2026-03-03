@@ -1048,24 +1048,25 @@ function initMemeAnsiosos(){
   });
 
 btn.onclick = async () => {
-  // oculto el botón y muestro loader
   btn.style.display = "none";
   loader.style.display = "block";
   videoWrap.style.display = "none";
 
-  // 🔥 FULLSCREEN DENTRO DEL CLICK (así no lo bloquea)
+  // pedir fullscreen en el click
   try{
     if(video.requestFullscreen) await video.requestFullscreen();
     else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
     else if(video.msRequestFullscreen) video.msRequestFullscreen();
-  }catch(e){ /* si falla, no pasa nada */ }
+  }catch(e){}
 
-  // show del texto
+  // preparar audio (en el click)
+  video.muted = false;
+  video.volume = 1;
+
   setTimeout(() => { texto.innerText = "Analizando..."; }, 400);
   setTimeout(() => { texto.innerText = "Detectando niveles de ansiedad..."; }, 2100);
   setTimeout(() => { texto.innerText = "INFORMACIÓN ENCONTRADA"; }, 3900);
 
-  // arrancar video
   setTimeout(() => {
     loader.style.display = "none";
     videoWrap.style.display = "block";
@@ -1349,6 +1350,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
