@@ -654,13 +654,6 @@ button{
 
 <div id="contenido" style="display:none">
 
-<div class="card">
-  <div class="apto-box">
-    <div class="apto-titulo">APTO EXAMEN</div>
-    <div id="aptoValor" class="apto-valor">-</div>
-  </div>
-</div>
-
   <div class="card">
   <div class="apto-box">
     <div class="apto-titulo">APTO EXAMEN</div>
@@ -679,7 +672,7 @@ button{
 
       <div id="videoTrollMeme" style="display:none; margin-top:14px;">
         <video id="memeVideo" width="420" controls playsinline>
-          <source src="meme.mp4" type="video/mp4">
+          <source src="media/meme.mp4" type="video/mp4">
         </video>
       </div>
     </div>
@@ -1026,7 +1019,7 @@ function initMemeAnsiosos(){
 
   if(!btn || !loader || !texto || !videoWrap || !video) return;
 
-  btn.addEventListener("click", ()=>{
+  btn.onclick = ()=>{
 
     // reset por si lo apretan 2 veces (ansiosos)
     video.pause();
@@ -1330,6 +1323,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
