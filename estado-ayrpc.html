@@ -664,58 +664,62 @@ button{
 <div id="contenido" style="display:none">
 
   <div class="card">
-  <div class="apto-box">
-    <div class="apto-titulo">APTO EXAMEN</div>
-    <div id="aptoValor" class="apto-valor">-</div>
+    <div class="apto-box">
+      <div class="apto-titulo">APTO EXAMEN</div>
+      <div id="aptoValor" class="apto-valor">-</div>
 
-    <!-- 👇 BOTÓN MEME ANSIOSOS (DEBAJO DEL APTO) -->
-<div id="estadoCorreccionContainer" style="margin-top:14px; text-align:center;">
-  <button id="btnEstadoCorreccion" class="btn-meme">
-    Ver estado de corrección
-  </button>
+      <!-- 👇 BOTÓN MEME ANSIOSOS (DEBAJO DEL APTO) -->
+      <div id="estadoCorreccionContainer" style="margin-top:14px; text-align:center;">
+        <button id="btnEstadoCorreccion" class="btn-meme">
+          Ver estado de corrección
+        </button>
 
-  <div id="loaderAreaMeme" style="display:none; margin-top:14px;">
-    <div class="spinner-meme"></div>
-    <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
+        <div id="loaderAreaMeme" style="display:none; margin-top:14px;">
+          <div class="spinner-meme"></div>
+          <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
+        </div>
+
+        <div id="videoTrollMeme" style="display:none; margin-top:14px;">
+          <video id="memeVideo" playsinline loop muted preload="auto">
+            <source src="media/meme.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+      <!-- 👆 FIN BOTÓN MEME -->
+
+    </div>
   </div>
 
-  <div id="videoTrollMeme" style="display:none; margin-top:14px;">
-    <video id="memeVideo" playsinline loop muted preload="auto"></video>
+  <div class="card">
+    <h2 id="nombre"></h2>
+    <div class="kpis">
+      <div class="kpi">Asistencia<span id="k-asistencia"></span></div>
+      <div class="kpi">%<span id="k-porcentaje"></span></div>
+      <div class="kpi">Estado<span id="k-estado"></span></div>
+    </div>
   </div>
-</div>
-    <!-- 👆 FIN BOTÓN MEME -->
 
-
-<div class="card">
-  <h2 id="nombre"></h2>
-  <div class="kpis">
-    <div class="kpi">Asistencia<span id="k-asistencia"></span></div>
-    <div class="kpi">%<span id="k-porcentaje"></span></div>
-    <div class="kpi">Estado<span id="k-estado"></span></div>
+  <div class="card">
+    <h3>Datos</h3>
+    <div class="datos">
+      <div><b>Correo:</b> <span id="d-correo"></span></div>
+      <div><b>Teléfono:</b> <span id="d-telefono"></span></div>
+      <div><b>Twitch:</b> <span id="d-twitch"></span></div>
+      <div><b>Observaciones:</b> <span id="d-obs"></span></div>
+    </div>
   </div>
-</div>
 
-<div class="card">
-  <h3>Datos</h3>
-  <div class="datos">
-    <div><b>Correo:</b> <span id="d-correo"></span></div>
-    <div><b>Teléfono:</b> <span id="d-telefono"></span></div>
-    <div><b>Twitch:</b> <span id="d-twitch"></span></div>
-    <div><b>Observaciones:</b> <span id="d-obs"></span></div>
+  <div class="card">
+    <h3>Clases</h3>
+    <table class="tabla">
+      <tbody id="tablaClases"></tbody>
+    </table>
   </div>
-</div>
 
-<div class="card">
-  <h3>Clases</h3>
-  <table class="tabla">
-    <tbody id="tablaClases"></tbody>
-  </table>
-</div>
-
-<div class="card">
-  <h3>Gráficos</h3>
-  <div id="graficos" class="graficos"></div>
-</div>
+  <div class="card">
+    <h3>Gráficos</h3>
+    <div id="graficos" class="graficos"></div>
+  </div>
 
 </div>
 </div>
@@ -1350,6 +1354,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
