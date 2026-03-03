@@ -627,6 +627,9 @@ button{
   width:100%;
   max-width:720px;
   border-radius:12px;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
 }
 
 </style>
@@ -666,24 +669,21 @@ button{
     <div id="aptoValor" class="apto-valor">-</div>
 
     <!-- 👇 BOTÓN MEME ANSIOSOS (DEBAJO DEL APTO) -->
-    <div id="estadoCorreccionContainer" style="margin-top:14px; text-align:center;">
-      <button id="btnEstadoCorreccion" class="btn-meme">
-        Ver estado de corrección
-      </button>
+<div id="estadoCorreccionContainer" style="margin-top:14px; text-align:center;">
+  <button id="btnEstadoCorreccion" class="btn-meme">
+    Ver estado de corrección
+  </button>
 
-      <div id="loaderAreaMeme" style="display:none; margin-top:14px;">
-        <div class="spinner-meme"></div>
-        <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
-      </div>
+  <div id="loaderAreaMeme" style="display:none; margin-top:14px;">
+    <div class="spinner-meme"></div>
+    <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
+  </div>
 
-      <video id="memeVideo" playsinline autoplay loop muted>
-        <source src="media/meme.mp4" type="video/mp4">
-      </video>
-      </div>
-    </div>
-    <!-- 👆 FIN BOTÓN MEME -->
+  <div id="videoTrollMeme" style="display:none; margin-top:14px;">
+    <video id="memeVideo" playsinline loop muted preload="auto"></video>
   </div>
 </div>
+    <!-- 👆 FIN BOTÓN MEME -->
 
 
 <div class="card">
@@ -1024,9 +1024,31 @@ function initMemeAnsiosos(){
 
   if(!btn || !loader || !texto || !videoWrap || !video) return;
 
-  btn.onclick = () => {
+  // Setup fijo (sin controles, loop, etc.)
+  video.controls = false;
+  video.loop = true;
+  video.muted = true;
+  video.playsInline = true;
 
-    // reset por si lo apretan 2 veces (ansiosos)
+  // Cargá el mp4 acá (así no se dispara solo por estar en el DOM)
+  // Si ya tiene <source> no pasa nada, pero esto te evita quilombos:
+  if(!video.src){
+    video.src = "media/meme.mp4";
+  }
+
+  // Anti-pausa
+  const forcePlay = () => video.play().catch(()=>{});
+  video.addEventListener("pause", forcePlay);
+
+  // Evitar pausa con click
+  video.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    forcePlay();
+  });
+
+  btn.onclick = () => {
+    // reset
     video.pause();
     video.currentTime = 0;
     videoWrap.style.display = "none";
@@ -1042,33 +1064,29 @@ function initMemeAnsiosos(){
       loader.style.display = "none";
       videoWrap.style.display = "block";
 
-      // anti pausa: si lo pausan, sigue
-      video.addEventListener("pause", () => {
-      video.play().catch(()=>{});
-      });
+      // Arranca
+      forcePlay();
 
-// anti click pausa (en algunos browsers click pausa)
-video.addEventListener("click", (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  video.play().catch(()=>{});
-});
+      // Fullscreen: SOLO funciona si el navegador lo considera “gesto del usuario”.
+      // Como esto corre 5.2s después, puede que Chrome lo bloquee.
+      const tryFs = () => {
+        if (document.fullscreenElement) return;
+        if (video.requestFullscreen) video.requestFullscreen().catch(()=>{});
+        else if (video.webkitRequestFullscreen) video.webkitRequestFullscreen();
+        else if (video.msRequestFullscreen) video.msRequestFullscreen();
+      };
 
-      const p = video.play();
+      // Intento 1 (puede fallar)
+      tryFs();
 
-      if(video.requestFullscreen){
-        video.requestFullscreen();
-      }else if(video.webkitRequestFullscreen){
-        video.webkitRequestFullscreen();
-      }else if(video.msRequestFullscreen){
-      video.msRequestFullscreen();
-      }
+      // Si falló, que el primer click dentro del video lo mande a fullscreen
+      const fsOnFirstTap = () => {
+        tryFs();
+        video.removeEventListener("click", fsOnFirstTap, true);
+      };
+      video.addEventListener("click", fsOnFirstTap, true);
 
-      if(p && typeof p.catch === "function"){
-        p.catch(()=>{});
-      }
     }, 5200);
-
   };
 }
 
@@ -1347,6 +1365,7 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
 
 
