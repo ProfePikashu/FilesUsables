@@ -825,7 +825,6 @@ async function cargar(){
   }
 }
 
-
 function procesar(a){
   login.style.display="none";
   contenido.style.display="block";
@@ -841,34 +840,29 @@ function procesar(a){
 
   aptoValor.textContent = apto || "-";
   aptoValor.className = "apto-valor " + (apto === "SI" ? "apto-si" : "apto-no");
-  
-const contMeme = document.getElementById("estadoCorreccionContainer");
-if (contMeme) {
-  contMeme.style.display = (apto === "SI") ? "block" : "none";
-}
 
-// ===== CONSTANCIA PDF (solo aptos) =====
-const boxConst = document.getElementById("constanciaBox");
-const btnConst = document.getElementById("btnConstancia");
+  // Mostrar/ocultar meme
+  const contMeme = document.getElementById("estadoCorreccionContainer");
+  if (contMeme) contMeme.style.display = (apto === "SI") ? "block" : "none";
 
-if (boxConst && btnConst) {
-  boxConst.style.display = (apto === "SI") ? "block" : "none";
+  // Mostrar/ocultar constancia + click
+  const boxConst = document.getElementById("constanciaBox");
+  const btnConst = document.getElementById("btnConstancia");
 
-  btnConst.onclick = () => {
-    const dni = (a["DNI"] || "").toString().trim();
-    if (!dni) return alert("No se encontró el DNI para generar la constancia.");
+  if (boxConst && btnConst) {
+    boxConst.style.display = (apto === "SI") ? "block" : "none";
 
-    const url = `${API_CONSTANCIA}?action=constancia_pdf&dni=${encodeURIComponent(dni)}`;
-    window.open(url, "_blank");
-  };
-}
+    btnConst.onclick = () => {
+      // Si en tu JSON no viene "DNI", usá el input como fallback
+      const dni = (a["DNI"] || document.getElementById("dniInput").value || "").toString().trim();
+      if (!dni) return alert("No se encontró el DNI para generar la constancia.");
 
-    
+      const url = `${API_CONSTANCIA}?action=constancia_pdf&dni=${encodeURIComponent(dni)}`;
+      window.open(url, "_blank");
+    };
   }
 
-console.log("APTO RECIBIDO:", a["APTO"]);
-
-
+  console.log("APTO RECIBIDO:", a["APTO"]);
 
   tablaClases.innerHTML="";
   graficos.innerHTML="";
@@ -902,20 +896,18 @@ console.log("APTO RECIBIDO:", a["APTO"]);
   });
 
   kAsistencia.textContent = ok + "/" + TOTAL_EVALUADAS;
-kPorcentaje.textContent = Math.round(ok / TOTAL_EVALUADAS * 100) + "%";
+  kPorcentaje.textContent = Math.round(ok / TOTAL_EVALUADAS * 100) + "%";
 
-const debe = TOTAL_EVALUADAS - ok;
+  const debe = TOTAL_EVALUADAS - ok;
 
-kEstado.textContent =
-  debe === 0 ? "EXCELENTE" :
-  debe === 1 ? "DEBE 1 CLASE" :
-  "DEBE " + debe + " CLASES";
+  kEstado.textContent =
+    debe === 0 ? "EXCELENTE" :
+    debe === 1 ? "DEBE 1 CLASE" :
+    "DEBE " + debe + " CLASES";
 
-kEstado.className =
-  debe === 0 ? "estado-ok" : "estado-bad";
+  kEstado.className = (debe === 0) ? "estado-ok" : "estado-bad";
 
   initMemeAnsiosos();
-
 }
 
 function parseT(t){
@@ -1388,4 +1380,5 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
+
 
