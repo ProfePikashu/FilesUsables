@@ -687,6 +687,14 @@ button{
       </div>
       <!-- 👆 FIN BOTÓN MEME -->
 
+      <!-- 👇 BOTÓN CONSTANCIA PDF (solo aptos) -->
+<div id="constanciaBox" style="margin-top:14px; text-align:center; display:none;">
+  <button id="btnConstancia" class="btn-meme" style="background:linear-gradient(90deg,#3cff8f,#6c63ff);">
+    ⏬ Constancia (PDF)
+  </button>
+</div>
+<!-- 👆 FIN CONSTANCIA PDF -->
+
     </div>
   </div>
 
@@ -726,6 +734,7 @@ button{
 
 <script>
 const API = "https://script.google.com/macros/s/AKfycbxdB1fbiT1S04N5LaiOqHCojJcO12YCOPg7ln21bFrMrEot5GSdyWzy6j6CyEAsuDen/exec";
+const API_CONSTANCIA = "https://script.google.com/macros/s/AKfycbwwMlT9cIOV3Nm057_XPfHT-tXaeKYv6cHZS4yMbtj5gd4q6NZZELCaMDRCb0YUD8v_hg/exec";
 
 const ORDEN = [
  {n:"Primera Clase",k:"1er"},
@@ -828,14 +837,33 @@ function procesar(a){
   dTwitch.textContent = a["Usuario de Twitch (en caso de no tener, deberá crear uno y usarlo en la cursada)"];
   dObs.textContent = a["Observaciones"];
 
-  const apto = (a["APTO"] || "").toUpperCase();
+  const apto = (a["APTO"] || "").toString().trim().toUpperCase();
 
   aptoValor.textContent = apto || "-";
   aptoValor.className = "apto-valor " + (apto === "SI" ? "apto-si" : "apto-no");
   
-  const contMeme = document.getElementById("estadoCorreccionContainer");
-  if (contMeme) {
-    contMeme.style.display = (apto === "SI") ? "block" : "none";
+const contMeme = document.getElementById("estadoCorreccionContainer");
+if (contMeme) {
+  contMeme.style.display = (apto === "SI") ? "block" : "none";
+}
+
+// ===== CONSTANCIA PDF (solo aptos) =====
+const boxConst = document.getElementById("constanciaBox");
+const btnConst = document.getElementById("btnConstancia");
+
+if (boxConst && btnConst) {
+  boxConst.style.display = (apto === "SI") ? "block" : "none";
+
+  btnConst.onclick = () => {
+    const dni = (a["DNI"] || "").toString().trim();
+    if (!dni) return alert("No se encontró el DNI para generar la constancia.");
+
+    const url = `${API_CONSTANCIA}?action=constancia_pdf&dni=${encodeURIComponent(dni)}`;
+    window.open(url, "_blank");
+  };
+}
+
+    
   }
 
 console.log("APTO RECIBIDO:", a["APTO"]);
@@ -951,6 +979,9 @@ function volver(){
   contenido.style.display="none";
   login.style.display="block";
   btnVolver.style.display="none";
+
+  const boxConst = document.getElementById("constanciaBox");
+  if (boxConst) boxConst.style.display = "none";
 }
 
 function toggleCronograma(){
@@ -1082,7 +1113,6 @@ btn.onclick = async () => {
   }, 5200);
 };
 } 
-
 
 </script>
   
@@ -1358,16 +1388,4 @@ if(window.innerWidth <= 488){
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
 
