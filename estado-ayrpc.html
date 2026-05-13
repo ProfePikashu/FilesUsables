@@ -826,6 +826,10 @@ function procesar(a){
   const boxCert = document.getElementById("certificadoBox");
   const btnCert = document.getElementById("btnCertificado");
 
+  // Reset estado anterior (por si el usuario busca un segundo DNI)
+  resultadoBox.style.display = "none";
+  if (boxCert) boxCert.style.display = "none";
+
   if (apto === "SI") {
     const resultado = (a["Resultado"] || "").toString().trim().toUpperCase();
 
@@ -858,9 +862,6 @@ function procesar(a){
       window.open(`${API_CONSTANCIA}?action=constancia_pdf&dni=${encodeURIComponent(dniAlumno)}`, "_blank");
     };
   }
-
-  resultadoBox.style.display = "none";
-  if (boxCert) boxCert.style.display = "none";
 
   tablaClases.innerHTML="";
   graficos.innerHTML="";
