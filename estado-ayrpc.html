@@ -843,9 +843,25 @@ function procesar(a){
 
       if (resultado === "APROBADO" && boxCert && btnCert) {
         boxCert.style.display = "block";
-        btnCert.onclick = () => {
+        btnCert.onclick = async () => {
           if (!dniAlumno) return alert("No se encontró el DNI para generar el certificado.");
-          window.open(API_CERTIFICADO + "?dni=" + encodeURIComponent(dniAlumno), "_blank");
+          const textoOriginal = btnCert.textContent;
+          btnCert.textContent = "⏳ Generando...";
+          btnCert.disabled = true;
+          try {
+            const r = await fetch(API_CERTIFICADO + "?dni=" + encodeURIComponent(dniAlumno));
+            const data = await r.json();
+            if (data.error) {
+              alert("Error: " + data.error);
+            } else if (data.url) {
+              window.open(data.url, "_blank");
+            }
+          } catch(err) {
+            alert("No se pudo generar el certificado. Intentá de nuevo.");
+          } finally {
+            btnCert.textContent = textoOriginal;
+            btnCert.disabled = false;
+          }
         };
       }
     }
