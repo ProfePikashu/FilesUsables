@@ -588,10 +588,7 @@ button{
   text-shadow:0 0 12px rgba(255,76,76,.8);
 }
 
-  /* ============================
-   MEME ANSIOSOS (BOTÓN + SPINNER)
-============================ */
-.btn-meme{
+  .btn-accion{
   width:auto;
   padding:10px 16px;
   border-radius:12px;
@@ -599,38 +596,24 @@ button{
   font-size:14px;
   font-weight:900;
   cursor:pointer;
-  background:linear-gradient(90deg,#ff0080,#6c63ff);
   color:#fff;
-  box-shadow:0 0 14px rgba(255,0,128,.35);
+  box-shadow:0 0 14px rgba(108,99,255,.35);
 }
 
-.btn-meme:hover{
+.btn-accion:hover{
   filter:brightness(1.08);
   transform:scale(1.02);
 }
 
-.spinner-meme{
-  width:44px;
-  height:44px;
-  border:6px solid rgba(255,255,255,.18);
-  border-top:6px solid #ff0080;
-  border-radius:50%;
-  margin:auto;
-  animation: spinMeme 1s linear infinite;
+.resultado-valor{
+  font-size:28px;
+  font-weight:900;
+  margin-top:6px;
 }
 
-@keyframes spinMeme{
-  to{ transform: rotate(360deg); }
-}
-
-#videoTrollMeme video{
-  width:100%;
-  max-width:720px;
-  border-radius:12px;
-  user-select:none;
-  -webkit-user-select:none;
-  -webkit-touch-callout:none;
-}
+.resultado-ok{ color:var(--ok); text-shadow:0 0 10px rgba(60,255,143,.7); }
+.resultado-bad{ color:var(--bad); text-shadow:0 0 10px rgba(255,76,76,.7); }
+.resultado-neutral{ color:var(--neutral); }
 
 </style>
 </head>
@@ -668,32 +651,25 @@ button{
       <div class="apto-titulo">APTO EXAMEN</div>
       <div id="aptoValor" class="apto-valor">-</div>
 
-      <!-- 👇 BOTÓN MEME ANSIOSOS (DEBAJO DEL APTO) -->
-      <div id="estadoCorreccionContainer" style="margin-top:14px; text-align:center;">
-        <button id="btnEstadoCorreccion" class="btn-meme">
-          Ver estado de corrección
-        </button>
-
-        <div id="loaderAreaMeme" style="display:none; margin-top:14px;">
-          <div class="spinner-meme"></div>
-          <div id="estadoTextoMeme" style="margin-top:12px; font-weight:800; color:#9fa8ff;"></div>
-        </div>
-
-        <div id="videoTrollMeme" style="display:none; margin-top:14px;">
-          <video id="memeVideo" playsinline loop muted preload="auto">
-            <source src="media/meme.mp4" type="video/mp4">
-          </video>
-        </div>
+      <!-- Resultado del examen (solo si APTO SI) -->
+      <div id="resultadoBox" style="margin-top:18px; display:none;">
+        <div class="apto-titulo" style="font-size:15px;">RESULTADO DEL EXAMEN</div>
+        <div id="resultadoValor" class="resultado-valor">-</div>
       </div>
-      <!-- 👆 FIN BOTÓN MEME -->
 
-      <!-- 👇 BOTÓN CONSTANCIA PDF (solo aptos) -->
-<div id="constanciaBox" style="margin-top:14px; text-align:center; display:none;">
-  <button id="btnConstancia" class="btn-meme" style="background:linear-gradient(90deg,#3cff8f,#6c63ff);">
-    ⏬ Constancia de alumno (PDF)
-  </button>
-</div>
-<!-- 👆 FIN CONSTANCIA PDF -->
+      <!-- Ver Certificado (solo si APROBADO) -->
+      <div id="certificadoBox" style="margin-top:14px; text-align:center; display:none;">
+        <button id="btnCertificado" class="btn-accion" style="background:linear-gradient(90deg,#ffd84c,#ff8c00); color:#002b00;">
+          🎓 Ver Certificado
+        </button>
+      </div>
+
+      <!-- Constancia de alumno (solo aptos) -->
+      <div id="constanciaBox" style="margin-top:14px; text-align:center; display:none;">
+        <button id="btnConstancia" class="btn-accion" style="background:linear-gradient(90deg,#3cff8f,#6c63ff);">
+          ⏬ Constancia de alumno (PDF)
+        </button>
+      </div>
 
     </div>
   </div>
@@ -735,6 +711,7 @@ button{
 <script>
 const API = "https://script.google.com/macros/s/AKfycbxdB1fbiT1S04N5LaiOqHCojJcO12YCOPg7ln21bFrMrEot5GSdyWzy6j6CyEAsuDen/exec";
 const API_CONSTANCIA = "https://script.google.com/macros/s/AKfycbwwMlT9cIOV3Nm057_XPfHT-tXaeKYv6cHZS4yMbtj5gd4q6NZZELCaMDRCb0YUD8v_hg/exec";
+const API_CERTIFICADO = "REEMPLAZAR_CON_URL_DEL_SCRIPT_GMAIL"; // Apps Script desplegado en andyazh30@gmail.com
 
 const ORDEN = [
  {n:"Primera Clase",k:"1er"},
@@ -841,28 +818,49 @@ function procesar(a){
   aptoValor.textContent = apto || "-";
   aptoValor.className = "apto-valor " + (apto === "SI" ? "apto-si" : "apto-no");
 
-  // Mostrar/ocultar meme
-  const contMeme = document.getElementById("estadoCorreccionContainer");
-  if (contMeme) contMeme.style.display = (apto === "SI") ? "block" : "none";
+  const dniAlumno = (a["DNI"] || document.getElementById("dniInput").value || "").toString().trim();
 
-  // Mostrar/ocultar constancia + click
+  // Resultado del examen + certificado (solo si APTO SI)
+  const resultadoBox = document.getElementById("resultadoBox");
+  const resultadoValor = document.getElementById("resultadoValor");
+  const boxCert = document.getElementById("certificadoBox");
+  const btnCert = document.getElementById("btnCertificado");
+
+  if (apto === "SI") {
+    const resultado = (a["Resultado"] || "").toString().trim().toUpperCase();
+
+    if (resultado) {
+      resultadoBox.style.display = "block";
+      resultadoValor.textContent = resultado;
+      resultadoValor.className = "resultado-valor " + (
+        resultado === "APROBADO" ? "resultado-ok" :
+        resultado === "REPROBADO" ? "resultado-bad" : "resultado-neutral"
+      );
+
+      if (resultado === "APROBADO" && boxCert && btnCert) {
+        boxCert.style.display = "block";
+        btnCert.onclick = () => {
+          if (!dniAlumno) return alert("No se encontró el DNI para generar el certificado.");
+          window.open(API_CERTIFICADO + "?dni=" + encodeURIComponent(dniAlumno), "_blank");
+        };
+      }
+    }
+  }
+
+  // Constancia de alumno (solo si APTO SI)
   const boxConst = document.getElementById("constanciaBox");
   const btnConst = document.getElementById("btnConstancia");
 
   if (boxConst && btnConst) {
     boxConst.style.display = (apto === "SI") ? "block" : "none";
-
     btnConst.onclick = () => {
-      // Si en tu JSON no viene "DNI", usá el input como fallback
-      const dni = (a["DNI"] || document.getElementById("dniInput").value || "").toString().trim();
-      if (!dni) return alert("No se encontró el DNI para generar la constancia.");
-
-      const url = `${API_CONSTANCIA}?action=constancia_pdf&dni=${encodeURIComponent(dni)}`;
-      window.open(url, "_blank");
+      if (!dniAlumno) return alert("No se encontró el DNI para generar la constancia.");
+      window.open(`${API_CONSTANCIA}?action=constancia_pdf&dni=${encodeURIComponent(dniAlumno)}`, "_blank");
     };
   }
 
-  console.log("APTO RECIBIDO:", a["APTO"]);
+  resultadoBox.style.display = "none";
+  if (boxCert) boxCert.style.display = "none";
 
   tablaClases.innerHTML="";
   graficos.innerHTML="";
@@ -906,8 +904,6 @@ function procesar(a){
     "DEBE " + debe + " CLASES";
 
   kEstado.className = (debe === 0) ? "estado-ok" : "estado-bad";
-
-  initMemeAnsiosos();
 }
 
 function parseT(t){
@@ -974,26 +970,23 @@ function volver(){
 
   const boxConst = document.getElementById("constanciaBox");
   if (boxConst) boxConst.style.display = "none";
+  const resultadoBox = document.getElementById("resultadoBox");
+  if (resultadoBox) resultadoBox.style.display = "none";
+  const boxCert = document.getElementById("certificadoBox");
+  if (boxCert) boxCert.style.display = "none";
 }
 
 function toggleCronograma(){
   const panel = document.getElementById("cronogramaPanel");
-  const contacto = document.getElementById("panelContacto");
-
-  // cerrar contacto si está abierto
-  contacto.classList.remove("open");
-
+  document.getElementById("panelContacto").classList.remove("open");
+  document.getElementById("faqPanel").classList.remove("active");
   panel.classList.toggle("open");
 }
 
-
 function toggleContacto(){
   const panel = document.getElementById("panelContacto");
-  const cronograma = document.getElementById("cronogramaPanel");
-
-  // cerrar cronograma si está abierto
-  cronograma.classList.remove("open");
-
+  document.getElementById("cronogramaPanel").classList.remove("open");
+  document.getElementById("faqPanel").classList.remove("active");
   panel.classList.toggle("open");
 }
 
@@ -1001,39 +994,32 @@ function toggleContacto(){
 document.addEventListener("click", (e)=>{
   const cronograma = document.getElementById("cronogramaPanel");
   const btnCrono = document.getElementById("btnAbrirCronograma");
-
   const contacto = document.getElementById("panelContacto");
   const btnContacto = document.getElementById("btnAbrirContacto");
+  const faq = document.getElementById("faqPanel");
+  const btnFaq = document.getElementById("btnFaq");
 
-  // click dentro de cronograma o su botón
-  if (
-    cronograma.classList.contains("open") &&
-    (cronograma.contains(e.target) || btnCrono.contains(e.target))
-  ) return;
-
-  // click dentro de contacto o su botón
-  if (
-    contacto.classList.contains("open") &&
-    (contacto.contains(e.target) || btnContacto.contains(e.target))
-  ) return;
+  if (cronograma.classList.contains("open") && (cronograma.contains(e.target) || btnCrono.contains(e.target))) return;
+  if (contacto.classList.contains("open") && (contacto.contains(e.target) || btnContacto.contains(e.target))) return;
+  if (faq.classList.contains("active") && (faq.contains(e.target) || btnFaq.contains(e.target))) return;
 
   cronograma.classList.remove("open");
   contacto.classList.remove("open");
+  faq.classList.remove("active");
 });
 
 document.addEventListener("DOMContentLoaded", () => {
 
   const faqBtn = document.getElementById("btnFaq");
   const faqPanel = document.getElementById("faqPanel");
-  const closeFaq = document.getElementById("closeFaq");
 
-  if(!faqBtn || !faqPanel || !closeFaq){
-    console.log("FAQ no encontrado en el DOM");
-    return;
-  }
+  if(!faqBtn || !faqPanel) return;
 
-  faqBtn.onclick = () => faqPanel.classList.add("active");
-  closeFaq.onclick = () => faqPanel.classList.remove("active");
+  faqBtn.onclick = () => {
+    document.getElementById("cronogramaPanel").classList.remove("open");
+    document.getElementById("panelContacto").classList.remove("open");
+    faqPanel.classList.toggle("active");
+  };
 
   document.querySelectorAll(".faq-question").forEach(btn=>{
     btn.onclick = () => {
@@ -1044,67 +1030,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
-  // ============================
-// MEME ANSIOSOS - Botón corrección
-// ============================
-function initMemeAnsiosos(){
-  const btn = document.getElementById("btnEstadoCorreccion");
-  const loader = document.getElementById("loaderAreaMeme");
-  const texto = document.getElementById("estadoTextoMeme");
-  const videoWrap = document.getElementById("videoTrollMeme");
-  const video = document.getElementById("memeVideo");
-
-  if(!btn || !loader || !texto || !videoWrap || !video) return;
-
-  // Setup fijo (sin controles, loop, etc.)
-  video.controls = false;
-  video.loop = true;
-  video.muted = true;
-  video.playsInline = true;
-
-  // Cargá el mp4 acá (así no se dispara solo por estar en el DOM)
-  // Si ya tiene <source> no pasa nada, pero esto te evita quilombos:
-  if(!video.src){
-    video.src = "media/meme.mp4";
-  }
-
-  // Anti-pausa
-  const forcePlay = () => video.play().catch(()=>{});
-  video.addEventListener("pause", forcePlay);
-
-  // Evitar pausa con click
-  video.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    forcePlay();
-  });
-
-btn.onclick = async () => {
-  btn.style.display = "none";
-  loader.style.display = "block";
-  videoWrap.style.display = "none";
-
-  try{
-    if(video.requestFullscreen) await video.requestFullscreen();
-    else if(video.webkitRequestFullscreen) video.webkitRequestFullscreen();
-    else if(video.msRequestFullscreen) video.msRequestFullscreen();
-  }catch(e){}
-
-  video.muted = false;
-  video.volume = 1;
-
-  setTimeout(() => { texto.innerText = "Analizando..."; }, 400);
-  setTimeout(() => { texto.innerText = "Detectando niveles de ansiedad..."; }, 2100);
-  setTimeout(() => { texto.innerText = "INFORMACIÓN ENCONTRADA"; }, 3900);
-
-  setTimeout(() => {
-    loader.style.display = "none";
-    videoWrap.style.display = "block";
-    video.currentTime = 0;
-    video.play().catch(()=>{});
-  }, 5200);
-};
-} 
 
 </script>
   
@@ -1200,7 +1125,6 @@ btn.onclick = async () => {
 
   <div class="panel-header">
     <h3>❓ Preguntas Frecuentes</h3>
-    <button id="closeFaq">✖</button>
   </div>
 
   <div class="faq-list">
